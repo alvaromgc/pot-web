@@ -16,12 +16,16 @@
  */
 function MembersCtrl($scope, $http, Members, GameService) {
 
-	$scope.inicio = 1750;
+	$scope.inicio = 1667;
 	
 	$scope.chartOptions = {
 	        responsive: true,
 	        maintainAspectRatio: false,
-	        animation: false
+	        animation: false,
+	        //Number - Width of the grid lines
+	        scaleGridLineWidth : 1,
+	        //Number - amount extra to add to the radius to cater for hit detection outside the drawn point
+	        pointHitDetectionRadius : 2
 	    };
 	
     // Define a refresh function, that updates the data from the REST service

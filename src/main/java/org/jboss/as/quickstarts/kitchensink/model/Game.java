@@ -59,6 +59,11 @@ public class Game implements Serializable {
     	return Arrays.asList(num1,num2,num3,num4,num5,num6);
     }
     
+    
+    @Transient
+    public String getPrintResult(){
+    	return num1+" "+num2+" "+num3+" "+num4+" "+num5+" "+num6;
+    }
 
     public Integer getNum1() {
 		return num1;

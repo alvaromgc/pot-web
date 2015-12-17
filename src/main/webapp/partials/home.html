@@ -95,18 +95,20 @@
     
     <BR />
     <!-- A list of all games -->
-    <h2>Games</h2>
+    <h2>Last Games</h2>
     <!-- If there are no members registered, instead of showing the table, we show a simple message. -->
     <em ng-show="games.length == 0">No registered games.</em>
     <table ng-hide="games.length == 0" class="simpletablestyle">
         <thead>
             <tr>
-                <th>Id</th>
+                <th>Result</th>
+                <th>Numbers</th>
             </tr>
         </thead>
         <!-- The table is built using the AngularJS repeat function, iterating over the members variable, and ordering by the property specified in the orderBy variable -->
-        <tr ng-repeat="game in allGames | limitTo: 10">
-            <td>{{game.concurso}}{{game.num1}}</td>
+        <tr ng-repeat="game in allGames | orderBy:'-concurso' | limitTo: 10">
+            <td>{{game.concurso}}</td>
+            <td>{{game.printResult}}</td>
     </table>
     
     
