@@ -16,6 +16,7 @@
  */
 package org.jboss.as.quickstarts.kitchensink.rest;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -46,6 +47,7 @@ import org.jboss.as.quickstarts.kitchensink.data.MemberRepository;
 import org.jboss.as.quickstarts.kitchensink.model.Game;
 import org.jboss.as.quickstarts.kitchensink.model.MediaDesv;
 import org.jboss.as.quickstarts.kitchensink.model.Member;
+import org.jboss.as.quickstarts.kitchensink.model.Ocorrencia;
 import org.jboss.as.quickstarts.kitchensink.service.MemberRegistration;
 import org.jboss.as.quickstarts.kitchensink.service.SurpresaEngine;
 import org.jboss.as.quickstarts.kitchensink.service.SurpresaService;
@@ -93,6 +95,38 @@ public class SurpresaResourceRESTService {
 		}
         builder = Response.ok(meddev);
         return meddev;
+    }
+    
+    @GET
+    @Path("/historicoOcorrencia")
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<Ocorrencia> returnListaOcorrencias(@QueryParam("ini") Integer inicio, @QueryParam("fim") Integer fim) {
+        List<Ocorrencia> ocorrencias = new ArrayList<>();
+        try {
+			ocorrencias = surpresaService.listaOcorrencia(inicio, fim);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			 // Handle generic exceptions
+            Map<String, String> responseObj = new HashMap<>();
+            responseObj.put("error", e.getMessage());
+		}
+        return ocorrencias;
+    }
+    
+    @GET
+    @Path("/numerosOcorrencia")
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<Ocorrencia> returnListaNumerosOcorrencia() {
+        List<Ocorrencia> ocorrencias = new ArrayList<>();
+        try {
+			ocorrencias = surpresaService.listaNumerosOcorrencia();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			 // Handle generic exceptions
+            Map<String, String> responseObj = new HashMap<>();
+            responseObj.put("error", e.getMessage());
+		}
+        return ocorrencias;
     }
 
     /**

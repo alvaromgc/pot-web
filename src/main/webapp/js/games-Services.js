@@ -55,6 +55,20 @@ angular.module('gamesService', ['ngResource']).
         		});
         };
         
+        factory.getHistoricoOcorrencias = function (ini, fim) {
+            return $http.get('rest/surpresa/historicoOcorrencia',
+            		{
+					params : {
+						ini : ini,
+						fim: fim
+					}
+        		});
+        };
+        
+        factory.getNumerosOcorrencias = function () {
+            return $http.get('rest/surpresa/numerosOcorrencia',{});
+        };
+        
         return factory;
     }
 })(angular);        

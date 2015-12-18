@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Random;
 
 import org.jboss.as.quickstarts.kitchensink.model.MediaDesv;
+import org.jboss.as.quickstarts.kitchensink.model.Ocorrencia;
 import org.jboss.as.quickstarts.kitchensink.model.Resultado;
 
 
@@ -207,7 +208,7 @@ public Random random = new Random();
 		System.out.println("Sao ["+contador+"] com ["+numeroSequencias+"] sequenciais");
 	}
 	
-	public Map<Integer, Integer> analiseOrdemAparicoes(List<List<Integer>> sorteados, boolean printStats){
+	public Map<Integer, Integer> analiseOrdemAparicoes(List<List<Integer>> sorteados){
 		Map<Integer, Integer> unidades = new HashMap<Integer, Integer>();
 		for (int i = 1; i < 61; i++) {
 			unidades.put(i, 0);
@@ -245,7 +246,7 @@ public Random random = new Random();
 		}
 		
 		for (Integer numero : result) {
-			if(printStats)System.out.println("O numero ["+numero+"] saiu ["+unidades.get(numero)+"] vezes.");
+			//if(printStats)System.out.println("O numero ["+numero+"] saiu ["+unidades.get(numero)+"] vezes.");
 			resultMap.put(numero, unidades.get(numero));
 		}
 		
@@ -257,13 +258,19 @@ public Random random = new Random();
 	 * Busca o historico das ordens de aparicao a partir do kesimo concurso
 	 * @param resultados
 	 */
-	public List<int[]> getHistoricoOcorrencias(List<List<Integer>> resultados, int k){
-		List<int[]> listaTiposOcorrencia = new ArrayList<int[]>();
-		for(int i = k; i < resultados.size(); i++){
+	public List<Ocorrencia> getHistoricoOcorrencias(List<List<Integer>> resultados){
+		List<Ocorrencia> listaTiposOcorrencia = new ArrayList<Ocorrencia>();
+		for(int i = 1; i < resultados.size(); i++){
 			List<List<Integer>> parcial = resultados.subList(0, i -1);
-			Map<Integer, Integer> mapaParcial = analiseOrdemAparicoes(parcial, false);
-			int[] a = quantidadeMaioMenorOcorrencia(mapaParcial, resultados.get(i));
-			listaTiposOcorrencia.add(a);
+			Map<Integer, Integer> mapaParcial = analiseOrdemAparicoes(parcial);
+			int[] a = {0,0,0,0};
+			//mapa de ocorrencias gerado a partir do 100 resultado
+			if(i > 100){
+				a = quantidadeMaioMenorOcorrencia(mapaParcial, resultados.get(i));
+			}
+			Ocorrencia oc = new Ocorrencia();
+			oc.setOcorrencias(a);
+			listaTiposOcorrencia.add(oc);
 		}
 		return listaTiposOcorrencia;
 		

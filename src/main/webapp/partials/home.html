@@ -111,9 +111,30 @@
             <td>{{game.printResult}}</td>
     </table>
     
+    <BR />
     
-     <input type="button" ng-click="geraGrafico()" name="cancel"
-                    id="graph" value="Gerar" />
+    <div id="divListOcorrencias">
+	    
+	    <h2>Number Stats</h2>
+	    <!-- If there are no members registered, instead of showing the table, we show a simple message. -->
+	    <em ng-show="numerosOcorrencia.length == 0">No stats.</em>
+	    <table ng-hide="numerosOcorrencia.length == 0" class="simpletablestyle">
+	        <thead>
+	            <tr>
+	                <th>Number</th>
+	                <th>Ocurrencies</th>
+	            </tr>
+	        </thead>
+	        <!-- The table is built using the AngularJS repeat function, iterating over the members variable, and ordering by the property specified in the orderBy variable -->
+	        <tr ng-repeat="oc in numerosOcorrencia ">
+	            <td>{{oc.numero}}</td>
+	            <td>{{oc.quantidade}}</td>
+	    </table>    
+    </div>
+    
+    <hr />
+    <input type="button" ng-click="geraGraficoMedia()" name="btgraficoMedia"
+                    id="graph" value="Gerar chart Media" />
     <div ng-show="data != null">
 	    <canvas id="line" class="chart chart-line" chart-data="data" height="600" width="1200" chart-options="chartOptions" 
 	  		chart-labels="labels" chart-legend="true" chart-series="series"
@@ -121,6 +142,28 @@
 		</canvas> 
     </div>
     
+    <hr />
+    
+    <input type="button" ng-click="geraGraficoOcorrencias(inicio, fim)" name="btgraficoOcorrencias"
+                    id="graphOc" value="Gerar Grafico por Ocorrencia" />
+    <BR />
+    <div ng-show="dataOcMaior != null">
+    	<h3>Maior & Media Maior</h3>
+	    <canvas id="ocrMaior" class="chart chart-line" chart-data="dataOcMaior" height="600" width="1200" chart-options="chartOptions" 
+	  		chart-labels="labelsOc" chart-legend="true" chart-series="seriesOcMaior"
+	  		chart-click="onClick" >
+		</canvas> 
+    </div>
+    
+    <BR />
+    
+    <div ng-show="dataOcMenor != null">
+    	<h3>Media Menor &  Menor</h3>
+	    <canvas id="ocrMenor" class="chart chart-line" chart-data="dataOcMenor" height="600" width="1200" chart-options="chartOptions" 
+	  		chart-labels="labelsOc" chart-legend="true" chart-series="seriesOcMenor"
+	  		chart-click="onClick" >
+		</canvas> 
+    </div>
     
     <div>
         <!-- The table has a button to manually refresh the values, in case, for example, someone else adds a member -->

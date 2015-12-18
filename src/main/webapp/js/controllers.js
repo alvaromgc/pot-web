@@ -17,6 +17,7 @@
 function MembersCtrl($scope, $http, Members, GameService) {
 
 	$scope.inicio = 1667;
+	$scope.fim = 0;
 	
 	$scope.chartOptions = {
 	        responsive: true,
@@ -34,10 +35,34 @@ function MembersCtrl($scope, $http, Members, GameService) {
         GameService.getAllGames().success(function(response){
         	$scope.allGames = response;
         });
-        $scope.medDesv = {};
+        GameService.getNumerosOcorrencias().success(function(response){
+        	$scope.numerosOcorrencia = response;
+        });
+        
+        limparGraficoMedia();
+        limparGraficoOcorrenciaMaior();
+        limparGraficoOcorrenciaMenor();
+    };
+    
+    var limparGraficoMedia = function(){
+    	$scope.medDesv = {};
         $scope.labels = {};
         $scope.series = [];
         $scope.data = null;
+    };
+    
+    var limparGraficoOcorrenciaMaior = function(){
+    	//$scope.medDesv = {};
+        //$scope.labelsOcMaior = {};
+        $scope.seriesOcMaior = [];
+        $scope.dataOcMaior = null;
+    };
+    
+    var limparGraficoOcorrenciaMenor = function(){
+    	//$scope.medDesv = {};
+        //$scope.labelsOcMenor = {};
+        $scope.seriesOcMenor = [];
+        $scope.dataOcMenor = null;
     };
 
     // Define a reset function, that clears the prototype newMember object, and
@@ -87,7 +112,9 @@ function MembersCtrl($scope, $http, Members, GameService) {
     
     
     
-    $scope.geraGrafico = function(){
+    $scope.geraGraficoMedia = function(){
+    	limparGraficoOcorrenciaMaior();
+    	limparGraficoOcorrenciaMenor();
     	GameService.getMediaDesv($scope.inicio,0).success(function(response) {
     		$scope.medDesv = response;
     		$scope.concursos = [];
@@ -107,10 +134,59 @@ function MembersCtrl($scope, $http, Members, GameService) {
     	
     };
     
-    
     $scope.onClick = function (points, evt) {
-      console.log(points, evt);
+        console.log(points, evt);
     };
     
+    $scope.geraGraficoOcorrencias = function(inicio, fim){
+    	limparGraficoMedia();
+    	$scope.concursos = [];
+    	GameService.getHistoricoOcorrencias(inicio, fim).success(function(response) {
+    		var resultadosOcorrencia = response;
+    		
+	        $scope.ocMaior = [];
+	        $scope.ocMedioMaior = [];
+	        $scope.ocMedioMenor = [];
+	        $scope.ocMenor= [];
+    		for(var i = inicio; i <= $scope.allGames.length; i++){
+	        	$scope.concursos.push(i.toString());
+	        }
+    		var i = 0;
+	        resultadosOcorrencia.forEach(function(res) {
+	        	$scope.ocMaior[i] = res.ocorrencias[0];
+	        	$scope.ocMedioMaior[i] = res.ocorrencias[1];
+	        	$scope.ocMedioMenor[i] = res.ocorrencias[2];
+	        	$scope.ocMenor[i] = res.ocorrencias[3];
+	        	i++;
+			});
+		}).then(function(){
+			var calcfim = 0;
+			if(fim == 0){
+				calcfim = $scope.concursos.length;
+			}else{
+				calcfim = fim;
+			}
+			
+			$scope.labelsOc = $scope.concursos.slice(0, calcfim);
+			$scope.seriesOcMaior = ['Maior Ocorrencia', 'Media Maior'];
+	        $scope.dataOcMaior = [
+	          $scope.ocMaior,
+	          $scope.ocMedioMaior
+	        ];
+	        
+	        //$scope.labels = $scope.concursos;
+	        $scope.seriesOcMenor = ['Média Menor', 'Menor Ocorrencia'];
+	        $scope.dataOcMenor = [
+	          $scope.ocMedioMenor,
+	          $scope.ocMenor
+	        ];
+	        
+	        console.log("result: "+JSON.stringify($scope.labelsOc));
+	        console.log("result: "+JSON.stringify($scope.concursos));
+		});
+       
+        //console.log('Mediadesv:'+JSON.stringify($scope.medDesv.media));
+    	
+    };
     
 }

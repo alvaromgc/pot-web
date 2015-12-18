@@ -20,6 +20,7 @@ import org.jboss.as.quickstarts.kitchensink.data.GameRepository;
 import org.jboss.as.quickstarts.kitchensink.model.Game;
 import org.jboss.as.quickstarts.kitchensink.model.MediaDesv;
 import org.jboss.as.quickstarts.kitchensink.model.Member;
+import org.jboss.as.quickstarts.kitchensink.model.Ocorrencia;
 
 import javax.ejb.Stateless;
 import javax.enterprise.event.Event;
@@ -28,6 +29,7 @@ import javax.persistence.EntityManager;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 // The @Stateless annotation eliminates the need for manual transaction demarcation
@@ -41,9 +43,11 @@ public class SurpresaService {
     private GameRepository gameRepository;
     
     @Inject
+    private List<Game> allGames;
+    
+    @Inject
     private SurpresaEngine se;
 
-    
     public MediaDesv listaMediaDevP(Integer begin, Integer end) throws Exception {
         //log.info("Calculating " + game);
        List<Game> games = gameRepository.findByRange(begin, end);
@@ -53,5 +57,39 @@ public class SurpresaService {
        }
        MediaDesv medDevp = se.mapaMediaDesvPadrao(jogos);
        return medDevp;
+    }
+    
+    public List<Ocorrencia> listaOcorrencia(Integer begin, Integer end) throws Exception {
+        //log.info("Calculating " + game);
+       List<Game> games = allGames;
+       List<List<Integer>> jogos = new ArrayList<>();
+       for (Game g : games) {
+    	   jogos.add(g.getList());
+       }
+       List<Ocorrencia> ocorrencias = se.getHistoricoOcorrencias(jogos);
+       Integer calcEnd = ocorrencias.size();
+       if(end > begin){
+    	   calcEnd = end;
+       }
+       return ocorrencias.subList(begin - 1, calcEnd);
+    }
+    
+    public List<Ocorrencia> listaNumerosOcorrencia() throws Exception {
+        //log.info("Calculating " + game);
+       List<Game> games = allGames;
+       List<List<Integer>> jogos = new ArrayList<>();
+       for (Game g : games) {
+    	   jogos.add(g.getList());
+       }
+       List<Ocorrencia> ocorrencias = new ArrayList<Ocorrencia>();
+       Map<Integer, Integer> result =  se.analiseOrdemAparicoes(jogos);
+       for (Integer num : result.keySet()) {
+    	   Ocorrencia o = new Ocorrencia();
+    	   o.setNumero(num);
+    	   o.setQuantidade(result.get(num));
+    	   ocorrencias.add(o);
+       }       
+       
+       return ocorrencias;
     }
 }
