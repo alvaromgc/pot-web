@@ -133,6 +133,12 @@
     </div>
     
     <hr />
+    <input type="number" ng-model="inicio" name="inptIni" id="inptIni"  
+   		ng-minlength="1"
+    	ng-maxlength="4" 
+    	min="1" 
+    	max="9999" />
+    
     <input type="button" ng-click="geraGraficoMedia()" name="btgraficoMedia"
                     id="graph" value="Gerar chart Media" />
     <div ng-show="data != null">
@@ -170,4 +176,10 @@
         <input type="button" ng-click="refresh()" name="refresh"
             id="refresh" value="Refresh" />
     </div>
+    
+    <hr />
+    
+    <input type="button" ng-click="check()" name="btcheck"
+                    id="bttstcd" value="atualizar" />
+    
 </div>

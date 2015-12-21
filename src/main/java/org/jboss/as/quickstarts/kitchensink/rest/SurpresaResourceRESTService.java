@@ -48,6 +48,7 @@ import org.jboss.as.quickstarts.kitchensink.model.Game;
 import org.jboss.as.quickstarts.kitchensink.model.MediaDesv;
 import org.jboss.as.quickstarts.kitchensink.model.Member;
 import org.jboss.as.quickstarts.kitchensink.model.Ocorrencia;
+import org.jboss.as.quickstarts.kitchensink.service.GameRegistration;
 import org.jboss.as.quickstarts.kitchensink.service.MemberRegistration;
 import org.jboss.as.quickstarts.kitchensink.service.SurpresaEngine;
 import org.jboss.as.quickstarts.kitchensink.service.SurpresaService;
@@ -66,6 +67,9 @@ public class SurpresaResourceRESTService {
 
     @Inject
     private SurpresaService surpresaService;
+    
+    @Inject
+    private GameRegistration gameRegistration;
      
     @Inject
     private List<Game> allGames;
@@ -128,7 +132,58 @@ public class SurpresaResourceRESTService {
 		}
         return ocorrencias;
     }
+    
+    
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response createGame(Game game) {
 
+        Response.ResponseBuilder builder = null;
+
+        try {
+
+            gameRegistration.register(game);
+
+            // Create an "ok" response
+            builder = Response.ok();
+        }catch (ConstraintViolationException ce) {
+            // Handle bean validation issues
+            builder = createViolationResponse(ce.getConstraintViolations());
+        }catch (ValidationException e) {
+            // Handle the unique constrain violation
+            Map<String, String> responseObj = new HashMap<>();
+            responseObj.put("email", "Email taken");
+            builder = Response.status(Response.Status.CONFLICT).entity(responseObj);
+        } catch (Exception e) {
+            // Handle generic exceptions
+            Map<String, String> responseObj = new HashMap<>();
+            responseObj.put("error", e.getMessage());
+            builder = Response.status(Response.Status.BAD_REQUEST).entity(responseObj);
+        }
+
+        return builder.build();
+    } 
+
+    /**
+     * Creates a JAX-RS "Bad Request" response including a map of all violation fields, and their message. This can then be used
+     * by clients to show violations.
+     * 
+     * @param violations A set of violations that needs to be reported
+     * @return JAX-RS response containing all violations
+     */
+    private Response.ResponseBuilder createViolationResponse(Set<ConstraintViolation<?>> violations) {
+        log.fine("Validation completed. violations found: " + violations.size());
+
+        Map<String, String> responseObj = new HashMap<>();
+
+        for (ConstraintViolation<?> violation : violations) {
+            responseObj.put(violation.getPropertyPath().toString(), violation.getMessage());
+        }
+
+        return Response.status(Response.Status.BAD_REQUEST).entity(responseObj);
+    }
+    
     /**
      * Creates a new member from the values provided. Performs validation, and will return a JAX-RS response with either 200 ok,
      * or with a map of fields, and related errors.

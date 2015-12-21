@@ -28,4 +28,7 @@ angular.module('kitchensink', ['membersService','gamesService','chart.js','ngRou
             }).otherwise({
                 redirectTo : '/home'
             });
-        } ]);
+        } ]).config(['$httpProvider', function ($httpProvider) {
+            $httpProvider.defaults.useXDomain = true;
+            delete $httpProvider.defaults.headers.common['X-Requested-With'];
+        }]);

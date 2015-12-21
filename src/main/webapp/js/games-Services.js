@@ -36,9 +36,9 @@ angular.module('gamesService', ['ngResource']).
     
     .factory('GameService', GameService);
     
-    GameService.$inject = ['$http'];
+    GameService.$inject = ['$http', '$resource'];
     
-    function GameService ($http) {
+    function GameService ($http,$resource) {
         var factory = {};
         
         factory.getAllGames = function () {
@@ -68,6 +68,42 @@ angular.module('gamesService', ['ngResource']).
         factory.getNumerosOcorrencias = function () {
             return $http.get('rest/surpresa/numerosOcorrencia',{});
         };
+        
+        factory.register = function (game) {
+            return $http.post('rest/surpresa',game);
+        };
+        
+        factory.getWsCaixa = function (concurso) {
+        	if(concurso != undefined){
+        		//return $http.get('http://wsloterias.azurewebsites.net/api/sorteio/getresultado/1/'+concurso,{});
+        		//$resource('http://wsloterias.azurewebsites.net/api/sorteio/getresultado/1/'+concurso, { format: 'json', jsoncallback: 'JSON_CALLBACK' }, { 'load': { 'method': 'JSONP' } });
+        		return $http.get('http://wsloterias.azurewebsites.net/api/sorteio/getresultado/1/'+concurso, { 
+        			headers: {
+	                'Content-Type': 'application/json' , 
+	                'Access-Control-Allow-Origin': '*',
+	                'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
+	                'Access-Control-Allow-Headers':'X-Requested-With'	
+        			}
+        		});
+        	}else{
+        		return $http.get('http://wsloterias.azurewebsites.net/api/sorteio/getresultado/1/',{
+        			headers: {
+	                'Content-Type': 'application/json' , 
+	                'Access-Control-Allow-Origin': '*',
+	                'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
+	                'Access-Control-Allow-Headers':'X-Requested-With'	
+        			}
+        		});
+        		//return $resource('http://wsloterias.azurewebsites.net/api/sorteio/getresultado/1/', {format: 'json'}, { 'load' : { 'method': 'GET', 'Content-Type': undefined } });
+        	}
+            
+        };
+       /*
+        {"NumeroConcurso":1771,"Acumulou":true,"EstimativaPremio":195000000.00,"ValorAcumulado":187769207.55,"Data":"2015-12-19","RealizadoEm":"Sorteio realizado em TARUMIRIM/MG  ",
+        "DescricaoAcumuladoOutro":"Valor acumulado para o próximo concurso de final cinco (1775)","ValorAcumuladoOutro":14497772.35,"DataProximo":"2015-12-22","ValorAcumuladoEspecial":95412469.00,
+        "Arrecadacao":109030383.00,"Sorteios":[{"NumSorteio":1,"Numeros":[38,2,27,28,32,20],"Premios":[{"Faixa":"Sena","NumeroGanhadores":0,"Valor":0.00},{"Faixa":"Quina","NumeroGanhadores":123,"Valor":51896.21},
+        {"Faixa":"Quadra","NumeroGanhadores":10330,"Valor":882.75}],"Ganhadores":[]}]} 
+        */
         
         return factory;
     }

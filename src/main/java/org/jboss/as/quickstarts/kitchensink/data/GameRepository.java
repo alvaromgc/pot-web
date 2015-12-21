@@ -59,7 +59,7 @@ public class GameRepository {
         if(end != null && end != 0){
         	criteria.select(g).where(cb.between(g.get(Game_.concurso), begin, end));
         }else{
-        	criteria.select(g).where(cb.gt(g.get(Game_.concurso), begin));
+        	criteria.select(g).where(cb.ge(g.get(Game_.concurso), begin));
         }
         return em.createQuery(criteria).getResultList();
     }

@@ -14,9 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-function MembersCtrl($scope, $http, Members, GameService) {
+function MembersCtrl($scope, $location, $http, Members, GameService, $q) {
 
-	$scope.inicio = 1667;
+	$scope.inicio = 1000;
 	$scope.fim = 0;
 	
 	$scope.chartOptions = {
@@ -27,11 +27,87 @@ function MembersCtrl($scope, $http, Members, GameService) {
 	        scaleGridLineWidth : 1,
 	        //Number - amount extra to add to the radius to cater for hit detection outside the drawn point
 	        pointHitDetectionRadius : 2
-	    };
+    };
+	
+	$scope.check =  function() {
+		var ultimo = $scope.allGames[$scope.allGames.length - 1].concurso;
+		var retorno = {};
+		GameService.getWsCaixa().success(function(data){//.load(function(data){
+			 retorno = data;
+			 //console.log(JSON.stringify(data));
+		  }).error(function(error) {
+			 console.log("Erro: "+JSON.stringify(error));
+			 alert('Erro ao atualizar');
+		  }).then(function() {
+			if(ultimo < retorno.NumeroConcurso){
+				console.log('Desatualizado... pronto para atualizar...');
+				var defer = $q.defer();
+				var promise = update(ultimo, retorno.NumeroConcurso, defer);
+				promise.then(function() {
+					console.log('Tudo atualizado');
+					$scope.refresh();
+					$location.path('/home');
+				});
+			}else{
+				console.log('Tudo atualizado');
+				alert('Tudo atualizado');
+			}
+		  });
+		
+	};
+	
+	var update = function(last, newest, defer){
+		console.log('Iniciando ciclo de atualizacao de '+(last+1)+' ate '+newest);
+		for(var i = last +1 ; i <= newest ; i++){
+			console.log('Atualizando '+i);
+			var deferint = $q.defer();
+			var promise = concursoAtrasado(i, deferint);
+			promise.then(function(ca) {
+				if(ca.NumeroConcurso){
+					console.log('Salvando attribuicoes');
+					var game = {};
+					game.concurso = ca.NumeroConcurso;
+					game.num1 = ca.Sorteios[0].Numeros[0]; 
+					game.num2 = ca.Sorteios[0].Numeros[1];
+					game.num3 = ca.Sorteios[0].Numeros[2]; 
+					game.num4 = ca.Sorteios[0].Numeros[3]; 
+					game.num5 = ca.Sorteios[0].Numeros[4]; 
+					game.num6 = ca.Sorteios[0].Numeros[5];
+					GameService.register(game).success(function(response){
+						console.log('Atualizando '+JSON.stringify(game));
+					});
+				}else{
+					var err = 'Busca do '+i+'concurso retornou erro';
+					alert(err);
+					console.log(err);
+					defer.reject();
+					return;
+				}
+			});
+		};
+		defer.resolve();
+		return defer.promise;
+	};
+	
+	var concursoAtrasado = function(numero, defer) {
+		var retorno = {};
+		GameService.getWsCaixa(numero).success(function(data){//.load(function(data){
+			console.log('Retornando dados do '+data.NumeroConcurso+ ' concurso');
+			console.log(JSON.stringify(data));
+			retorno = data;
+		  }).error(function(error) {
+			defer.reject(error);
+		  }).then(function() {
+			defer.resolve(retorno);
+		});
+		return defer.promise;
+	};
 	
     // Define a refresh function, that updates the data from the REST service
     $scope.refresh = function() {
-        $scope.members = Members.query();
+    	$scope.errorMessages = [];
+    	$scope.errorMessages.push("dadadada");
+    	$scope.members = Members.query();
         GameService.getAllGames().success(function(response){
         	$scope.allGames = response;
         });
@@ -100,18 +176,6 @@ function MembersCtrl($scope, $http, Members, GameService) {
 
     };
 
-    // Call the refresh() function, to populate the list of members
-    $scope.refresh();
-
-    // Initialize newMember here to prevent Angular from sending a request
-    // without a proper Content-Type.
-    $scope.reset();
-
-    // Set the default orderBy to the name property
-    $scope.orderBy = 'name';
-    
-    
-    
     $scope.geraGraficoMedia = function(){
     	limparGraficoOcorrenciaMaior();
     	limparGraficoOcorrenciaMenor();
@@ -188,5 +252,15 @@ function MembersCtrl($scope, $http, Members, GameService) {
         //console.log('Mediadesv:'+JSON.stringify($scope.medDesv.media));
     	
     };
+    
+    // Call the refresh() function, to populate the list of members
+    $scope.refresh();
+
+    // Initialize newMember here to prevent Angular from sending a request
+    // without a proper Content-Type.
+    $scope.reset();
+
+    // Set the default orderBy to the name property
+    $scope.orderBy = 'name';
     
 }

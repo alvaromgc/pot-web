@@ -71,7 +71,7 @@ public class SurpresaService {
        if(end > begin){
     	   calcEnd = end;
        }
-       return ocorrencias.subList(begin - 1, calcEnd);
+       return ocorrencias. subList(begin - 2, calcEnd);
     }
     
     public List<Ocorrencia> listaNumerosOcorrencia() throws Exception {
