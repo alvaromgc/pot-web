@@ -96,6 +96,9 @@
     <BR />
     <!-- A list of all games -->
     <h2>Last Games</h2>
+    <div>
+        Não esta atualizado?: <a type="link" href="" id="atualizar" ng-click="check()">atualizar</a>
+    </div>
     <!-- If there are no members registered, instead of showing the table, we show a simple message. -->
     <em ng-show="games.length == 0">No registered games.</em>
     <table ng-hide="games.length == 0" class="simpletablestyle">
@@ -123,26 +126,30 @@
 	            <tr>
 	                <th>Number</th>
 	                <th>Ocurrencies</th>
+	                <th>Classe Ocorrencia</th>
 	            </tr>
 	        </thead>
 	        <!-- The table is built using the AngularJS repeat function, iterating over the members variable, and ordering by the property specified in the orderBy variable -->
 	        <tr ng-repeat="oc in numerosOcorrencia ">
 	            <td>{{oc.numero}}</td>
 	            <td>{{oc.quantidade}}</td>
+	            <td>{{oc.classeAparicao}}</td>
 	    </table>    
     </div>
     
     <hr />
+    <label for="inptIni">Concurso Inicio:</label>
     <input type="number" ng-model="inicio" name="inptIni" id="inptIni"  
    		ng-minlength="1"
     	ng-maxlength="4" 
     	min="1" 
     	max="9999" />
-    
+    <p>Um numero muito maior que 500 resultados dificulta a visualização, utilize intervalos entre 100 e 200.</p>	
+    <BR />
     <input type="button" ng-click="geraGraficoMedia()" name="btgraficoMedia"
-                    id="graph" value="Gerar chart Media" />
+                    id="graph" value="Plot Media" />
     <div ng-show="data != null">
-	    <canvas id="line" class="chart chart-line" chart-data="data" height="600" width="1200" chart-options="chartOptions" 
+	    <canvas id="line" class="chart chart-line" chart-data="data" height="400" width="1200" chart-options="chartOptions" 
 	  		chart-labels="labels" chart-legend="true" chart-series="series"
 	  		chart-click="onClick" >
 		</canvas> 
@@ -151,7 +158,7 @@
     <hr />
     
     <input type="button" ng-click="geraGraficoOcorrencias(inicio, fim)" name="btgraficoOcorrencias"
-                    id="graphOc" value="Gerar Grafico por Ocorrencia" />
+                    id="graphOc" value="Plot Ocorrencias" />
     <BR />
     <div ng-show="dataOcMaior != null">
     	<h3>Maior & Media Maior</h3>
@@ -179,7 +186,5 @@
     
     <hr />
     
-    <input type="button" ng-click="check()" name="btcheck"
-                    id="bttstcd" value="atualizar" />
     
 </div>

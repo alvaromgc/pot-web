@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import org.jboss.as.quickstarts.kitchensink.model.EnumClasseAparicao;
 import org.jboss.as.quickstarts.kitchensink.model.MediaDesv;
 import org.jboss.as.quickstarts.kitchensink.model.Ocorrencia;
 import org.jboss.as.quickstarts.kitchensink.model.Resultado;
@@ -357,7 +358,7 @@ public Random random = new Random();
 		}
 	}
 	
-	public void printValoresQuantidadesOcorrencias(Map<Integer, Integer> mapa){
+	public EnumClasseAparicao getClasseOcorrencia(Map<Integer, Integer> mapa, Integer quantidade){
 		Iterator<Integer> ite = mapa.keySet().iterator(); 
 		Integer menorValor = mapa.get((Integer)ite.next());
 		Integer maiorValor = 0;
@@ -369,7 +370,34 @@ public Random random = new Random();
 		Integer umQuarto = (Integer)((meio + menorValor)/2);
 		Integer tresQuarto = (Integer)((maiorValor + meio)/2);
 		
-		System.out.println("Classes de ordem sao: Maior:"+maiorValor+" Meio maior: "+tresQuarto+" Meio : "+meio+" Meio menor: "+umQuarto+" Menor: "+menorValor);
+		EnumClasseAparicao eca = null;
+		
+		if(quantidade >= tresQuarto){
+			eca = EnumClasseAparicao.MAIOR;
+		}else if(quantidade < tresQuarto && quantidade >= meio){
+			eca = EnumClasseAparicao.MEDIO_MAIOR;
+		}else if(quantidade >= umQuarto && quantidade < meio){
+			eca = EnumClasseAparicao.MEDIO_MENOR;
+		}else if(quantidade < umQuarto){
+			eca = EnumClasseAparicao.MENOR;
+		}
+		
+		return eca;
 	}
+	
+//	public void printValoresQuantidadesOcorrencias(Map<Integer, Integer> mapa){
+//		Iterator<Integer> ite = mapa.keySet().iterator(); 
+//		Integer menorValor = mapa.get((Integer)ite.next());
+//		Integer maiorValor = 0;
+//		while (ite.hasNext()) {
+//			maiorValor = mapa.get((Integer) ite.next());
+//		}
+//		
+//		Integer meio = (Integer)((maiorValor + menorValor)/2);
+//		Integer umQuarto = (Integer)((meio + menorValor)/2);
+//		Integer tresQuarto = (Integer)((maiorValor + meio)/2);
+//		
+//		System.out.println("Classes de ordem sao: Maior:"+maiorValor+" Meio maior: "+tresQuarto+" Meio : "+meio+" Meio menor: "+umQuarto+" Menor: "+menorValor);
+//	}
 	
 }

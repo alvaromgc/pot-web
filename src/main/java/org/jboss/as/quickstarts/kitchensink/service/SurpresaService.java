@@ -87,6 +87,7 @@ public class SurpresaService {
     	   Ocorrencia o = new Ocorrencia();
     	   o.setNumero(num);
     	   o.setQuantidade(result.get(num));
+    	   o.setClasseAparicao(se.getClasseOcorrencia(result, o.getQuantidade()));
     	   ocorrencias.add(o);
        }       
        

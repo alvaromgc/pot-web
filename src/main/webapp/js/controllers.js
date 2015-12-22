@@ -30,7 +30,7 @@ function MembersCtrl($scope, $location, $http, Members, GameService, $q) {
     };
 	
 	$scope.check =  function() {
-		var ultimo = $scope.allGames[$scope.allGames.length - 1].concurso;
+		var ultimo = $scope.allGames.length//$scope.allGames[$scope.allGames.length - 1].concurso;
 		var retorno = {};
 		GameService.getWsCaixa().success(function(data){//.load(function(data){
 			 retorno = data;
@@ -39,6 +39,7 @@ function MembersCtrl($scope, $location, $http, Members, GameService, $q) {
 			 console.log("Erro: "+JSON.stringify(error));
 			 alert('Erro ao atualizar');
 		  }).then(function() {
+			  console.log(ultimo+' menor que '+retorno.NumeroConcurso);  
 			if(ultimo < retorno.NumeroConcurso){
 				console.log('Desatualizado... pronto para atualizar...');
 				var defer = $q.defer();
@@ -46,7 +47,7 @@ function MembersCtrl($scope, $location, $http, Members, GameService, $q) {
 				promise.then(function() {
 					console.log('Tudo atualizado');
 					$scope.refresh();
-					$location.path('/home');
+					$location.path('/');
 				});
 			}else{
 				console.log('Tudo atualizado');

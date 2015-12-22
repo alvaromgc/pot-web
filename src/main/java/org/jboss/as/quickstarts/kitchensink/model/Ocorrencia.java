@@ -5,6 +5,8 @@ public class Ocorrencia {
 	private Integer numero;
 	private Integer quantidade;
 	private int[] ocorrencias;
+	private EnumClasseAparicao classeAparicao;
+	
 	
 	public Integer getNumero() {
 		return numero;
@@ -29,5 +31,14 @@ public class Ocorrencia {
 	public void setOcorrencias(int[] ocorrencias) {
 		this.ocorrencias = ocorrencias;
 	}
+
+	public EnumClasseAparicao getClasseAparicao() {
+		return classeAparicao;
+	}
+
+	public void setClasseAparicao(EnumClasseAparicao classeAparicao) {
+		this.classeAparicao = classeAparicao;
+	}
+
 
 }
