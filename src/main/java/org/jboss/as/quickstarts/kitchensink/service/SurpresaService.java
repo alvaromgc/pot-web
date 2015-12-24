@@ -18,6 +18,7 @@ package org.jboss.as.quickstarts.kitchensink.service;
 
 import org.jboss.as.quickstarts.kitchensink.data.GameRepository;
 import org.jboss.as.quickstarts.kitchensink.model.Game;
+import org.jboss.as.quickstarts.kitchensink.model.Guess;
 import org.jboss.as.quickstarts.kitchensink.model.MediaDesv;
 import org.jboss.as.quickstarts.kitchensink.model.Member;
 import org.jboss.as.quickstarts.kitchensink.model.Ocorrencia;
@@ -62,11 +63,7 @@ public class SurpresaService {
     public List<Ocorrencia> listaOcorrencia(Integer begin, Integer end) throws Exception {
         //log.info("Calculating " + game);
        List<Game> games = allGames;
-       List<List<Integer>> jogos = new ArrayList<>();
-       for (Game g : games) {
-    	   jogos.add(g.getList());
-       }
-       List<Ocorrencia> ocorrencias = se.getHistoricoOcorrencias(jogos);
+       List<Ocorrencia> ocorrencias = se.getHistoricoOcorrencias(games);
        Integer calcEnd = ocorrencias.size();
        if(end > begin){
     	   calcEnd = end;
@@ -77,12 +74,8 @@ public class SurpresaService {
     public List<Ocorrencia> listaNumerosOcorrencia() throws Exception {
         //log.info("Calculating " + game);
        List<Game> games = allGames;
-       List<List<Integer>> jogos = new ArrayList<>();
-       for (Game g : games) {
-    	   jogos.add(g.getList());
-       }
        List<Ocorrencia> ocorrencias = new ArrayList<Ocorrencia>();
-       Map<Integer, Integer> result =  se.analiseOrdemAparicoes(jogos);
+       Map<Integer, Integer> result =  se.analiseOrdemAparicoes(games);
        for (Integer num : result.keySet()) {
     	   Ocorrencia o = new Ocorrencia();
     	   o.setNumero(num);
@@ -92,5 +85,14 @@ public class SurpresaService {
        }       
        
        return ocorrencias;
+    }
+    
+    public List<Game> gerarSurpresas(Guess guess, boolean print){
+    	List<Game> surpresas = new ArrayList<Game>();
+    	int[] ocorrencias = {guess.getMaiorFrequencia(),guess.getMediaMaiorFrequencia(),guess.getMediaMenorFrequencia(),guess.getMenorFrequencia()};
+    	List<Game> games = allGames;
+    	surpresas = se.littleSurprise(guess.getMedia(), guess.getDesvio(), guess.getQuantidade(), games, ocorrencias, print);
+    	
+    	return surpresas;
     }
 }

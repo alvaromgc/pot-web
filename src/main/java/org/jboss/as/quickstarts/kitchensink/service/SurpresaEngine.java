@@ -8,16 +8,23 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.logging.Logger;
+
+import javax.inject.Inject;
 
 import org.jboss.as.quickstarts.kitchensink.model.EnumClasseAparicao;
+import org.jboss.as.quickstarts.kitchensink.model.Game;
 import org.jboss.as.quickstarts.kitchensink.model.MediaDesv;
 import org.jboss.as.quickstarts.kitchensink.model.Ocorrencia;
 import org.jboss.as.quickstarts.kitchensink.model.Resultado;
 
 
 public class SurpresaEngine {
+	
+	@Inject
+    private Logger log;
 
-public Random random = new Random();
+	public Random random = new Random();
 	
 	public void setSeed(long seed){
 		this.random = new Random(seed);
@@ -31,12 +38,20 @@ public Random random = new Random();
 	 * @param med media
 	 * @param dep desv padrao
 	 * @param qnt numero de geracoes
-	 * @param map *opt mapa com numero calculado de ocorrencias por num
+	 * @param games jogos anteriores para calculo de ocorrencias
 	 * @param occurs *opt lista com quantidades de occorrencias desejadas: 1 maior ocorrencia, 2 media maior, 3 media menor, 4 menor
 	 * @param printLog *opt imprime med e desvp das tentativas
 	 * @return
 	 */
-	public List<List<Integer>> littleSurprise(double med, double dep, int qnt, Map<Integer, Integer> map, int[] occurs, boolean printLog) {
+	public List<Game> littleSurprise(double med, double dep, int qnt, List<Game> games, int[] occurs, boolean printLog) {
+		//List<Ocorrencia> ocorrencias = 
+		
+		//LinkedHashMap<Integer, Integer> map = transformaMapOcorrencias(ocorrencias);
+		if(occurs[0] == 0 && occurs[1] == 0 && occurs[2] == 0 && occurs[3] == 0){
+			occurs = null;
+		}
+		
+		Map<Integer, Integer> map = analiseOrdemAparicoes(games);
 		
 		List<List<Integer>> lifi = new ArrayList<List<Integer>>();
 		
@@ -78,18 +93,18 @@ public Random random = new Random();
 					
 					if(( med == 0 && dep == 0 || (medVale && depVale)) && !containsSeq(lifi, seq) && (occurs == null || analiseQuantidadeMaiorMenorOcorrencia(map, seq,occurs) )){
 						lifi.get(i).addAll(seq);
+						Collections.sort(lifi.get(i));
 						if(printLog){
-							System.out.print("med: "+calcmed);
-							System.out.print(" devp: "+calcdep);
-							System.out.println();
+							log.fine("med: "+calcmed);
+							log.fine(" devp: "+calcdep);
 						}
 					}
 					tentativas++;
 					if(tentativas > 10000000){//max 2bi
-						System.out.println("Após 10 mi de tentativas não foi possível gerar todos "+qnt+" numeros com essas características...");
-						if(lifi.size() > 0){
-							printResult(lifi);
-						}
+						//System.out.println("Após 10 mi de tentativas não foi possível gerar todos "+qnt+" numeros com essas características...");
+						//if(lifi.size() > 0){
+						//	printResult(lifi);
+						//}
 						//System.out.println("Program ended!");
 						//System.exit(0);
 						//break;
@@ -101,13 +116,14 @@ public Random random = new Random();
 				
 			} while (lifi.get(i).size() < 6);
 		}
-		printResult(lifi);
-		return lifi;
+		//printResult(lifi);
+		List<Game> surpresas = transformaListToGame(lifi);
+		return surpresas;
 	}
 	
 	public void printResult(List<List<Integer>> lifi){
 		for (int i = 0; i < lifi.size(); i++) {
-			Collections.sort(lifi.get(i));
+			//Collections.sort(lifi.get(i));
 			for (int j = 0; j < 6; j++) {
 				if(lifi.get(i) != null && !lifi.get(i).isEmpty()){
 					System.out.print(lifi.get(i).get(j) + ",");
@@ -209,15 +225,15 @@ public Random random = new Random();
 		System.out.println("Sao ["+contador+"] com ["+numeroSequencias+"] sequenciais");
 	}
 	
-	public Map<Integer, Integer> analiseOrdemAparicoes(List<List<Integer>> sorteados){
+	public Map<Integer, Integer> analiseOrdemAparicoes(List<Game> sorteados){
 		Map<Integer, Integer> unidades = new HashMap<Integer, Integer>();
 		for (int i = 1; i < 61; i++) {
 			unidades.put(i, 0);
 		}
 		for (Integer num : unidades.keySet()) {
 			int ap = 0;
-			for (List<Integer> gam : sorteados) {
-				if(gam.contains(num)){
+			for (Game gam : sorteados) {
+				if(gam.getList().contains(num)){
 					ap++;
 				}
 			}
@@ -246,8 +262,15 @@ public Random random = new Random();
 			result.add(menorKey);
 		}
 		
+		//List<Ocorrencia> ocorrencias = new ArrayList<Ocorrencia>();
+		
+		
 		for (Integer numero : result) {
 			//if(printStats)System.out.println("O numero ["+numero+"] saiu ["+unidades.get(numero)+"] vezes.");
+			//Ocorrencia oc = new Ocorrencia();
+			//oc.setNumero(numero);
+			//oc.setQuantidade(unidades.get(numero));
+			//ocorrencias.add(oc);
 			resultMap.put(numero, unidades.get(numero));
 		}
 		
@@ -259,15 +282,15 @@ public Random random = new Random();
 	 * Busca o historico das ordens de aparicao a partir do kesimo concurso
 	 * @param resultados
 	 */
-	public List<Ocorrencia> getHistoricoOcorrencias(List<List<Integer>> resultados){
+	public List<Ocorrencia> getHistoricoOcorrencias(List<Game> resultados){
 		List<Ocorrencia> listaTiposOcorrencia = new ArrayList<Ocorrencia>();
 		for(int i = 1; i < resultados.size(); i++){
-			List<List<Integer>> parcial = resultados.subList(0, i -1);
+			List<Game> parcial = resultados.subList(0, i -1);
 			Map<Integer, Integer> mapaParcial = analiseOrdemAparicoes(parcial);
 			int[] a = {0,0,0,0};
 			//mapa de ocorrencias gerado a partir do 100 resultado
 			if(i > 100){
-				a = quantidadeMaioMenorOcorrencia(mapaParcial, resultados.get(i));
+				a = quantidadeMaioMenorOcorrencia(mapaParcial, resultados.get(i).getList());
 			}
 			Ocorrencia oc = new Ocorrencia();
 			oc.setOcorrencias(a);
@@ -384,6 +407,29 @@ public Random random = new Random();
 		
 		return eca;
 	}
+	
+	private LinkedHashMap<Integer, Integer> transformaMapOcorrencias(List<Ocorrencia> ocorrencias){
+		LinkedHashMap<Integer, Integer> resultMap = new LinkedHashMap<Integer, Integer>();
+		for (Ocorrencia ocorrencia : ocorrencias) {
+			resultMap.put(ocorrencia.getNumero(), ocorrencia.getQuantidade());
+		}
+		return resultMap;
+	};
+	
+	private List<Game> transformaListToGame(List<List<Integer>> lista){
+		List<Game> games = new ArrayList<>();
+		for (List<Integer> listInt : lista) {
+			Game g = new Game();
+			g.setNum1(listInt.get(0));
+			g.setNum2(listInt.get(1));
+			g.setNum3(listInt.get(2));
+			g.setNum4(listInt.get(3));
+			g.setNum5(listInt.get(4));
+			g.setNum6(listInt.get(5));
+			games.add(g);
+		}
+		return games;
+	};
 	
 //	public void printValoresQuantidadesOcorrencias(Map<Integer, Integer> mapa){
 //		Iterator<Integer> ite = mapa.keySet().iterator(); 

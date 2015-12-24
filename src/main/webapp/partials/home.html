@@ -16,7 +16,7 @@
     limitations under the License.
 -->
 <!-- This is a partial, and is templated by AngularJS -->
-<div>
+<div ng-controller="MembersCtrl" >
     <h1>Welcome</h1>
 
     <div>
@@ -95,33 +95,34 @@
     
     <BR />
     <!-- A list of all games -->
-    <h2>Last Games</h2>
-    <div>
-        Não esta atualizado?: <a type="link" href="" id="atualizar" ng-click="check()">atualizar</a>
+    <h2>Last Games<a type="link" href="" id="shGames" ng-click="showHideGames()">(+)</a></h2>
+    <div ng-hide="hideGames">
+        Não esta atualizado?: <a href="" id="atualizar" ng-click="check()">atualizar</a>
+    
+	    <!-- If there are no members registered, instead of showing the table, we show a simple message. -->
+	    <em ng-show="games.length == 0">No registered games.</em>
+	    <table ng-hide="games.length == 0" class="simpletablestyle">
+	        <thead>
+	            <tr>
+	                <th>Result</th>
+	                <th>Numbers</th>
+	            </tr>
+	        </thead>
+	        <!-- The table is built using the AngularJS repeat function, iterating over the members variable, and ordering by the property specified in the orderBy variable -->
+	        <tr ng-repeat="game in allGames | orderBy:'-concurso' | limitTo: 10">
+	            <td>{{game.concurso}}</td>
+	            <td>{{game.printResult}}</td>
+	    </table>
     </div>
-    <!-- If there are no members registered, instead of showing the table, we show a simple message. -->
-    <em ng-show="games.length == 0">No registered games.</em>
-    <table ng-hide="games.length == 0" class="simpletablestyle">
-        <thead>
-            <tr>
-                <th>Result</th>
-                <th>Numbers</th>
-            </tr>
-        </thead>
-        <!-- The table is built using the AngularJS repeat function, iterating over the members variable, and ordering by the property specified in the orderBy variable -->
-        <tr ng-repeat="game in allGames | orderBy:'-concurso' | limitTo: 10">
-            <td>{{game.concurso}}</td>
-            <td>{{game.printResult}}</td>
-    </table>
     
     <BR />
     
     <div id="divListOcorrencias">
 	    
-	    <h2>Number Stats</h2>
+	    <h2>Number Stats<a type="link" href="" id="shStats" ng-click="showHideStats()">(+)</a></h2>
 	    <!-- If there are no members registered, instead of showing the table, we show a simple message. -->
 	    <em ng-show="numerosOcorrencia.length == 0">No stats.</em>
-	    <table ng-hide="numerosOcorrencia.length == 0" class="simpletablestyle">
+	    <table ng-hide="numerosOcorrencia.length == 0 || hideStats" class="simpletablestyle">
 	        <thead>
 	            <tr>
 	                <th>Number</th>
@@ -144,15 +145,21 @@
     	ng-maxlength="4" 
     	min="1" 
     	max="9999" />
+    Min: <input type="number" ng-model="chartConfig.xAxis.currentMin">
+    Max: <input type="number" ng-model="chartConfig.xAxis.currentMax">	
+    	
     <p>Um numero muito maior que 500 resultados dificulta a visualização, utilize intervalos entre 100 e 200.</p>	
     <BR />
     <input type="button" ng-click="geraGraficoMedia()" name="btgraficoMedia"
                     id="graph" value="Plot Media" />
     <div ng-show="data != null">
+	    <highchart id="chart1" config="chartConfig" class="span10"></highchart>
+	    <!-- 
 	    <canvas id="line" class="chart chart-line" chart-data="data" height="400" width="1200" chart-options="chartOptions" 
 	  		chart-labels="labels" chart-legend="true" chart-series="series"
 	  		chart-click="onClick" >
 		</canvas> 
+	     -->
     </div>
     
     <hr />
@@ -185,6 +192,76 @@
     </div>
     
     <hr />
+    
+    <form id="surp">
+        <h2>Surprise</h2>
+        <fieldset>
+            <legend>Parametros:</legend>
+            <!-- Each input is bound to a property on the prototype newMember object -->
+            <div>
+                <label for="med">Media:</label>
+                <input type="text" name="med" id="media"  ng-model="guess.media" required autofocus/>
+                <span class="error" ng-show="errors.name">{{errors.name}}</span>
+            </div>
+            <div>
+                <label for="desvio">Desvio:</label>
+                <input type="text" name="desvio" id="desvio" ng-model="guess.desvio" required/>
+                <span class="error" ng-show="errors.email">{{errors.email}}</span>
+            </div>
+            <div>
+                <label for="maiorFreq">Maior Freq:</label>
+                <input type="number" name="maiorFreq" id="maiorFreq" ng-model="guess.maiorFrequencia" pattern="[0-9]" ng-maxlength="1" ng-required="true"/>
+                <!-- <slider floor="0" ceiling="6" step="1" precision="1" ng-model="guess.maiorFrequencia"></slider> -->
+            </div>
+            <div>
+                <label for="medMaior">Media maior:</label>
+                <input type="number" name="medMaior" id="medMaior" ng-model="guess.mediaMaiorFrequencia" pattern="[0-9]" required/>
+            </div>
+            <div>
+                <label for="medMenor">Media menor:</label>
+                <input type="number" name="medMenor" id="medMenor" ng-model="guess.mediaMenorFrequencia" pattern="[0-9]" required/>
+            </div>
+            <div>
+                <label for="menorFreq">Menor Freq:</label>
+                <input type="number" name="menorFreq" id="menorFreq" ng-model="guess.menorFrequencia" pattern="[0-9]" required/>
+            </div>
+            <div>
+                <label for="qntd">Quantidade:</label>
+                <input type="number" name="qntd" id="qntd" ng-model="guess.quantidade" required/>
+            </div>
+            
+            <!-- We output a list of success messages (appropriately styled!) for the form. -->
+            <ul ng-hide="!successMessages" class="success">
+                <li ng-repeat="message in successMessages">{{message}}</li>
+            </ul>
+
+            <!-- Output the list of error messages if any. -->
+            <ul ng-hide="!errorMessages" class="error">
+                <li ng-repeat="message in errorMessages">{{message}}</li>
+            </ul>
+
+            <!-- There are two buttons, the default submit action (which is bound for the whole form), and a reset button, that clears the form. -->
+            <div>
+                <input type="button" id="generate" ng-click="gerar()" value="Surprise" data-ng-disabled="surp.$invalid" />
+                <input type="button" ng-click="reset()" name="cancel"
+                    id="cancel" value="Cancel" />
+            </div>
+        </fieldset>
+    </form>
+    
+    <div>
+    	<h2>Resultados</h2>
+        <em ng-show="surpresas.length == 0">No surprise games.</em>
+	    <table ng-hide="surpresas.length == 0" class="simpletablestyle">
+	        <thead>
+	            <tr>
+	                <th>Numbers</th>
+	            </tr>
+	        </thead>
+	        <tr ng-repeat="win in surpresas">
+	            <td>{{win.printResult}}</td>
+	    </table>
+    </div>
     
     
 </div>

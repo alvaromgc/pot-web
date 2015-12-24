@@ -65,6 +65,10 @@ angular.module('gamesService', ['ngResource']).
         		});
         };
         
+        factory.getSurpresas = function (guess) {
+            return $http.post('rest/surpresa/surpresinhas',guess);
+        };
+        
         factory.getNumerosOcorrencias = function () {
             return $http.get('rest/surpresa/numerosOcorrencia',{});
         };

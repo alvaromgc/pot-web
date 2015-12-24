@@ -45,6 +45,7 @@ import javax.ws.rs.core.Response.ResponseBuilder;
 
 import org.jboss.as.quickstarts.kitchensink.data.MemberRepository;
 import org.jboss.as.quickstarts.kitchensink.model.Game;
+import org.jboss.as.quickstarts.kitchensink.model.Guess;
 import org.jboss.as.quickstarts.kitchensink.model.MediaDesv;
 import org.jboss.as.quickstarts.kitchensink.model.Member;
 import org.jboss.as.quickstarts.kitchensink.model.Ocorrencia;
@@ -99,6 +100,26 @@ public class SurpresaResourceRESTService {
 		}
         builder = Response.ok(meddev);
         return meddev;
+    }
+    
+    @POST
+    @Path("/surpresinhas")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public List<Game> returnMediaDevp(Guess guess) {
+    	List<Game> games = new ArrayList<Game>();
+        Response.ResponseBuilder builder = null;
+        try {
+        	games = surpresaService.gerarSurpresas(guess, true);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			 // Handle generic exceptions
+            Map<String, String> responseObj = new HashMap<>();
+            responseObj.put("error", e.getMessage());
+            builder = Response.status(Response.Status.BAD_REQUEST).entity(responseObj);
+		}
+        builder = Response.ok(games);
+        return games;
     }
     
     @GET
