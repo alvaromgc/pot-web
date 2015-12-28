@@ -18,7 +18,6 @@ package org.jboss.as.quickstarts.kitchensink.rest;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -26,32 +25,23 @@ import java.util.logging.Logger;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
-import javax.persistence.NoResultException;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import javax.validation.ValidationException;
-import javax.validation.Validator;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.ResponseBuilder;
 
-import org.jboss.as.quickstarts.kitchensink.data.MemberRepository;
 import org.jboss.as.quickstarts.kitchensink.model.Game;
 import org.jboss.as.quickstarts.kitchensink.model.Guess;
 import org.jboss.as.quickstarts.kitchensink.model.MediaDesv;
-import org.jboss.as.quickstarts.kitchensink.model.Member;
 import org.jboss.as.quickstarts.kitchensink.model.Ocorrencia;
 import org.jboss.as.quickstarts.kitchensink.service.GameRegistration;
-import org.jboss.as.quickstarts.kitchensink.service.MemberRegistration;
-import org.jboss.as.quickstarts.kitchensink.service.SurpresaEngine;
 import org.jboss.as.quickstarts.kitchensink.service.SurpresaService;
 
 /**
@@ -79,7 +69,20 @@ public class SurpresaResourceRESTService {
     @Path("/resultados")
     @Produces(MediaType.APPLICATION_JSON)
     public List<Game> listAllGames() {
-        return allGames;
+        List<Game> all =  new ArrayList<Game>();
+    	Response.ResponseBuilder builder = null;
+        try {
+			all = surpresaService.findAll();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			 // Handle generic exceptions
+            Map<String, String> responseObj = new HashMap<>();
+            responseObj.put("error", e.getMessage());
+            builder = Response.status(Response.Status.BAD_REQUEST).entity(responseObj);
+		}
+        builder = Response.ok(all);
+    	
+    	return all;
     }
 
     

@@ -97,11 +97,13 @@
     <!-- A list of all games -->
     <h2>Last Games<a type="link" href="" id="shGames" ng-click="showHideGames()">(+)</a></h2>
     <div ng-hide="hideGames">
-        Não esta atualizado?: <a href="" id="atualizar" ng-click="check()">atualizar</a>
+        Não esta atualizado?: <input type="button" ng-click="check()" name="updatelst"
+                    id="atualizar" value="atualizar" /> 
+        <!-- <a type="button" href="" id="atualizar" ng-click="check()">atualizar</a> -->
     
 	    <!-- If there are no members registered, instead of showing the table, we show a simple message. -->
-	    <em ng-show="games.length == 0">No registered games.</em>
-	    <table ng-hide="games.length == 0" class="simpletablestyle">
+	    <em ng-show="lastGames.length == 0">No registered games.</em>
+	    <table ng-hide="lastGames.length == 0" class="simpletablestyle">
 	        <thead>
 	            <tr>
 	                <th>Result</th>
@@ -109,7 +111,7 @@
 	            </tr>
 	        </thead>
 	        <!-- The table is built using the AngularJS repeat function, iterating over the members variable, and ordering by the property specified in the orderBy variable -->
-	        <tr ng-repeat="game in allGames | orderBy:'-concurso' | limitTo: 10">
+	        <tr ng-repeat="game in lastGames | orderBy:'-concurso'">
 	            <td>{{game.concurso}}</td>
 	            <td>{{game.printResult}}</td>
 	    </table>
@@ -145,14 +147,14 @@
     	ng-maxlength="4" 
     	min="1" 
     	max="9999" />
-    Min: <input type="number" ng-model="chartConfig.xAxis.currentMin">
-    Max: <input type="number" ng-model="chartConfig.xAxis.currentMax">	
+    <!-- Min: <input type="number" ng-model="chartConfig.xAxis.currentMin">
+    Max: <input type="number" ng-model="chartConfig.xAxis.currentMax"> -->	
     	
     <p>Um numero muito maior que 500 resultados dificulta a visualização, utilize intervalos entre 100 e 200.</p>	
     <BR />
     <input type="button" ng-click="geraGraficoMedia()" name="btgraficoMedia"
                     id="graph" value="Plot Media" />
-    <div ng-show="data != null">
+    <div ng-show="medDesv.media != null">
 	    <highchart id="chart1" config="chartConfig" class="span10"></highchart>
 	    <!-- 
 	    <canvas id="line" class="chart chart-line" chart-data="data" height="400" width="1200" chart-options="chartOptions" 
@@ -167,22 +169,24 @@
     <input type="button" ng-click="geraGraficoOcorrencias(inicio, fim)" name="btgraficoOcorrencias"
                     id="graphOc" value="Plot Ocorrencias" />
     <BR />
-    <div ng-show="dataOcMaior != null">
+    <div ng-show="ocMaior != null">
     	<h3>Maior & Media Maior</h3>
-	    <canvas id="ocrMaior" class="chart chart-line" chart-data="dataOcMaior" height="600" width="1200" chart-options="chartOptions" 
+	    <highchart id="chartmx" config="chartConfigMedMax" class="span10"></highchart>
+	    <!-- <canvas id="ocrMaior" class="chart chart-line" chart-data="dataOcMaior" height="600" width="1200" chart-options="chartOptions" 
 	  		chart-labels="labelsOc" chart-legend="true" chart-series="seriesOcMaior"
 	  		chart-click="onClick" >
-		</canvas> 
+		</canvas>  -->
     </div>
     
     <BR />
     
-    <div ng-show="dataOcMenor != null">
+    <div ng-show="ocMenor != null">
     	<h3>Media Menor &  Menor</h3>
-	    <canvas id="ocrMenor" class="chart chart-line" chart-data="dataOcMenor" height="600" width="1200" chart-options="chartOptions" 
+	    <highchart id="chartmn" config="chartConfigMedMin" class="span10"></highchart>
+	    <!-- <canvas id="ocrMenor" class="chart chart-line" chart-data="dataOcMenor" height="600" width="1200" chart-options="chartOptions" 
 	  		chart-labels="labelsOc" chart-legend="true" chart-series="seriesOcMenor"
 	  		chart-click="onClick" >
-		</canvas> 
+		</canvas>  -->
     </div>
     
     <div>
@@ -262,6 +266,4 @@
 	            <td>{{win.printResult}}</td>
 	    </table>
     </div>
-    
-    
 </div>

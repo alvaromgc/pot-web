@@ -34,6 +34,7 @@
 		$scope.medDesv = {};
 		$scope.medDesv.media = [];
 		$scope.allGames = [];
+		$scope.lastGames = [];
 		
 		
 		$scope.chartOptions = {
@@ -63,13 +64,15 @@
 					var promise = update(ultimo, retorno.NumeroConcurso, defer);
 					promise.then(function() {
 						console.log('Tudo atualizado');
-						//loadGames();
+						$scope.loadGames();
+						//alert('Atualizado com sucesso.');
 						//$location.path('/home');
 					});
 				}else{
 					console.log('Tudo atualizado');
 					alert('Tudo atualizado');
 				}
+				$scope.refresh();
 			  });
 			
 		};
@@ -110,7 +113,7 @@
 		var concursoAtrasado = function(numero, defer) {
 			var retorno = {};
 			GameService.getWsCaixa(numero).success(function(data){//.load(function(data){
-				console.log('Retornando dados do '+data.NumeroConcurso+ ' concurso');
+				console.log('Retornando dados do concurso'+data.NumeroConcurso+ ' .');
 				console.log(JSON.stringify(data));
 				retorno = data;
 			  }).error(function(error) {
@@ -126,7 +129,7 @@
 	    	$scope.errorMessages = [];
 	    	$scope.errorMessages.push("dadadada");
 	    	$scope.members = Members.query();
-	        loadGames();
+	    	$scope.loadGames();
 	        GameService.getNumerosOcorrencias().success(function(response){
 	        	$scope.numerosOcorrencia = response;
 	        });
@@ -136,10 +139,12 @@
 	        limparGraficoOcorrenciaMenor();
 	    };
 	    
-	    var loadGames =  function (){
+	    $scope.loadGames =  function (){
 	    	GameService.getAllGames().success(function(response){
-	        	$scope.allGames = response;
-	        });
+	    		$scope.allGames =  response;
+	        }).then(function() {
+				$scope.lastGames = $scope.allGames.slice($scope.allGames.length - 10);
+			});
 	    };
 	    
 	    var limparGraficoMedia = function(){
@@ -208,16 +213,24 @@
 		        	$scope.concursos.push(i.toString());
 		        }
 			}).then(function(){
-				$scope.labels = $scope.concursos;
-		        $scope.series = ['Média', 'Desvio'];
-		        $scope.data = [
-		          $scope.medDesv.media,
-		          $scope.medDesv.desvio
-		        ];
+//				$scope.labels = $scope.concursos;
+//		        $scope.series = ['Média', 'Desvio'];
+//		        $scope.data = [
+//		          $scope.medDesv.media,
+//		          $scope.medDesv.desvio
+//		        ];
 		        $scope.chartConfig.series = [];
 		        $scope.chartConfig.series.push({
-		            data: $scope.medDesv.media
+		            name: "Media",
+		        	data: $scope.medDesv.media
 		        });
+		        $scope.chartConfig.series.push({
+		            name: "Desvio",
+		        	data: $scope.medDesv.desvio
+		        });
+		        $scope.chartConfig.xAxis = {};
+		        $scope.chartConfig.xAxis.categories = [];
+		        $scope.chartConfig.xAxis.categories = $scope.concursos;
 		        //console.log('Mediadesv:'+JSON.stringify($scope.medDesv.media));
 			});
 	       
@@ -257,19 +270,47 @@
 					calcfim = fim;
 				}
 				
-				$scope.labelsOc = $scope.concursos.slice(0, calcfim);
-				$scope.seriesOcMaior = ['Maior Ocorrencia', 'Media Maior'];
-		        $scope.dataOcMaior = [
-		          $scope.ocMaior,
-		          $scope.ocMedioMaior
-		        ];
+				$scope.chartConfigMedMax.series = [];
+		        $scope.chartConfigMedMax.series.push({
+		            name: "Maior Ocr",
+		        	data: $scope.ocMaior
+		        });
+		        $scope.chartConfigMedMax.series.push({
+		            name: "Media Maior",
+		        	data: $scope.ocMedioMaior
+		        });
+		        $scope.chartConfigMedMax.xAxis = {};
+		        $scope.chartConfigMedMax.xAxis.categories = [];
+		        $scope.chartConfigMedMax.xAxis.categories = $scope.concursos.slice(0, calcfim);
+				
+		        
+		        $scope.chartConfigMedMin.series = [];
+		        $scope.chartConfigMedMin.series.push({
+		            name: "Media Menor",
+		        	data: $scope.ocMedioMenor
+		        });
+		        $scope.chartConfigMedMin.series.push({
+		            name: "Menor ocr",
+		        	data: $scope.ocMenor
+		        });
+		        $scope.chartConfigMedMin.xAxis = {};
+		        $scope.chartConfigMedMin.xAxis.categories = [];
+		        $scope.chartConfigMedMin.xAxis.categories = $scope.concursos.slice(0, calcfim);
+		        
+		        
+//				$scope.labelsOc = $scope.concursos.slice(0, calcfim);
+//				$scope.seriesOcMaior = ['Maior Ocorrencia', 'Media Maior'];
+//		        $scope.dataOcMaior = [
+//		          $scope.ocMaior,
+//		          $scope.ocMaior
+//		        ];
 		        
 		        //$scope.labels = $scope.concursos;
-		        $scope.seriesOcMenor = ['Média Menor', 'Menor Ocorrencia'];
-		        $scope.dataOcMenor = [
-		          $scope.ocMedioMenor,
-		          $scope.ocMenor
-		        ];
+//		        $scope.seriesOcMenor = ['Média Menor', 'Menor Ocorrencia'];
+//		        $scope.dataOcMenor = [
+//		          $scope.ocMedioMenor,
+//		          $scope.ocMenor
+//		        ];
 			});
 	       
 	        //console.log('Mediadesv:'+JSON.stringify($scope.medDesv.media));
@@ -283,14 +324,51 @@
 	                    zoomType: 'x'
 	                }
 	            },
-	            series: [{
+	            /*series: [{
 	                data: []
-	            }],
+	            }],*/
 	            title: {
-	                text: 'Hello'
+	                text: 'MedDesv'
+	            }
+	            //,
+	            //xAxis: {currentMin: 0, currentMax: 10, minRange: 1},
+	            //loading: false
+        };
+	    
+	    $scope.chartConfigMedMax = {
+	            options: {
+	                chart: {
+	                    type: 'line',
+	                    zoomType: 'x'
+	                }
 	            },
-	            xAxis: {currentMin: 0, currentMax: 10, minRange: 1},
-	            loading: false
+	            /*series: [{
+	                data: []
+	            }],*/
+	            title: {
+	                text: 'MedMax'
+	            }
+	            //,
+	            //xAxis: {currentMin: 0, currentMax: 10, minRange: 1},
+	            //loading: false
+        };
+	    
+	    $scope.chartConfigMedMin = {
+	            options: {
+	                chart: {
+	                    type: 'line',
+	                    zoomType: 'x'
+	                }
+	            },
+	            /*series: [{
+	                data: []
+	            }],*/
+	            title: {
+	                text: 'MedMin'
+	            }
+	            //,
+	            //xAxis: {currentMin: 0, currentMax: 10, minRange: 1},
+	            //loading: false
         };
 	    
 	    $scope.gerar = function() {

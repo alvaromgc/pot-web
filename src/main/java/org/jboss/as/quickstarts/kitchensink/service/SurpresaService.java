@@ -16,22 +16,19 @@
  */
 package org.jboss.as.quickstarts.kitchensink.service;
 
-import org.jboss.as.quickstarts.kitchensink.data.GameRepository;
-import org.jboss.as.quickstarts.kitchensink.model.Game;
-import org.jboss.as.quickstarts.kitchensink.model.Guess;
-import org.jboss.as.quickstarts.kitchensink.model.MediaDesv;
-import org.jboss.as.quickstarts.kitchensink.model.Member;
-import org.jboss.as.quickstarts.kitchensink.model.Ocorrencia;
-
-import javax.ejb.Stateless;
-import javax.enterprise.event.Event;
-import javax.inject.Inject;
-import javax.persistence.EntityManager;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
+
+import javax.ejb.Stateless;
+import javax.inject.Inject;
+
+import org.jboss.as.quickstarts.kitchensink.data.GameRepository;
+import org.jboss.as.quickstarts.kitchensink.model.Game;
+import org.jboss.as.quickstarts.kitchensink.model.Guess;
+import org.jboss.as.quickstarts.kitchensink.model.MediaDesv;
+import org.jboss.as.quickstarts.kitchensink.model.Ocorrencia;
 
 // The @Stateless annotation eliminates the need for manual transaction demarcation
 @Stateless
@@ -94,5 +91,9 @@ public class SurpresaService {
     	surpresas = se.littleSurprise(guess.getMedia(), guess.getDesvio(), guess.getQuantidade(), games, ocorrencias, print);
     	
     	return surpresas;
+    }
+    
+    public List<Game> findAll(){
+    	return gameRepository.findAll();
     }
 }
