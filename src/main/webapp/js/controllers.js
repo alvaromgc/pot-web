@@ -64,15 +64,15 @@
 					var promise = update(ultimo, retorno.NumeroConcurso, defer);
 					promise.then(function() {
 						console.log('Tudo atualizado');
-						$scope.loadGames();
+						//$scope.loadGames();
 						//alert('Atualizado com sucesso.');
-						//$location.path('/home');
+						$location.path('/home');
 					});
 				}else{
 					console.log('Tudo atualizado');
 					alert('Tudo atualizado');
 				}
-				$scope.refresh();
+				//$scope.refresh();
 			  });
 			
 		};
@@ -173,6 +173,11 @@
 	    $scope.reset = function() {
 	        // clear input fields
 	        $scope.newMember = {};
+	    };
+	    
+	    $scope.resetGuess = function() {
+	        // clear input fields
+	        $scope.guess = {};
 	    };
 	
 	    // Define a register function, which adds the member using the REST service,
@@ -372,9 +377,34 @@
         };
 	    
 	    $scope.gerar = function() {
-	    	GameService.getSurpresas($scope.guess).success(function(response) {
-	    		$scope.surpresas = response;
-			});
+	    	if(validar($scope.guess)){
+	    		GameService.getSurpresas($scope.guess).success(function(response) {
+	    			$scope.surpresas = response;
+	    		});
+	    	}
+		};
+		//guess.mediaMaiorFrequencia
+		var validar = function(guess) {
+			$scope.errorMessages = [];
+			var valido = true;
+			if(isNaN(guess.media)){
+				$scope.errorMessages.push("Campo media incorreto.");
+				return false;
+			}
+			if(isNaN(guess.desvio)){
+				$scope.errorMessages.push("Campo desvio incorreto.");
+				return false;
+			}
+			if(isNaN(guess.maiorFrequencia) || isNaN(guess.mediaMaiorFrequencia) || isNaN(guess.mediaMenorFrequencia) || isNaN(guess.menorFrequencia)){
+				$scope.errorMessages.push("Campos frequencia incorretos.");
+				return false;
+			}
+			if((guess.maiorFrequencia + guess.mediaMaiorFrequencia + guess.mediaMenorFrequencia + guess.menorFrequencia) != 6){
+				$scope.errorMessages.push("Soma das frequencias deve ser 6.");
+				return false;
+			}
+			return valido;
+			
 		};
 	    
 	    $scope.showHideGames = function() {
@@ -386,7 +416,7 @@
 		};
 	    
 	    // Call the refresh() function, to populate the list of members
-	    $scope.refresh();
+	    //$scope.refresh();
 	
 	    // Initialize newMember here to prevent Angular from sending a request
 	    // without a proper Content-Type.

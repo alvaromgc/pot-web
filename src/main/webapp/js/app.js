@@ -16,7 +16,7 @@
  */
 // Define any routes for the app
 // Note that this app is a single page app, and each partial is routed to using the URL fragment. For example, to select the 'home' route, the URL is http://localhost:8080/wildfly-kitchensink-angularjs/#/home
-angular.module('kitchensink', ['membersCtrl','membersService','gamesService','chart.js','highcharts-ng','ui.slider','ngRoute']).config(
+angular.module('kitchensink', ['membersCtrl','membersService','gamesService', 'chart.js','highcharts-ng','ui.slider','ngRoute']).config(
         [ '$routeProvider', function($routeProvider) {
             $routeProvider.
             // if URL fragment is /home, then load the home partial, with the
