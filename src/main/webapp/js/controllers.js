@@ -57,11 +57,11 @@
 				 console.log("Erro: "+JSON.stringify(error));
 				 alert('Erro ao atualizar');
 			  }).then(function() {
-				  console.log(ultimo+' menor que '+retorno.NumeroConcurso);  
-				if(ultimo < retorno.NumeroConcurso){
+				  console.log(ultimo+' menor que '+retorno.numero);  
+				if(ultimo < retorno.numero){
 					console.log('Desatualizado... pronto para atualizar...');
 					var defer = $q.defer();
-					var promise = update(ultimo, retorno.NumeroConcurso, defer);
+					var promise = update(ultimo, retorno.numero, defer);
 					promise.then(function() {
 						console.log('Tudo atualizado');
 						//$scope.loadGames();
@@ -84,16 +84,16 @@
 				var deferint = $q.defer();
 				var promise = concursoAtrasado(i, deferint);
 				promise.then(function(ca) {
-					if(ca.NumeroConcurso){
+					if(ca.numero){
 						console.log('Salvando attribuicoes');
 						var game = {};
-						game.concurso = ca.NumeroConcurso;
-						game.num1 = ca.Sorteios[0].Numeros[0]; 
-						game.num2 = ca.Sorteios[0].Numeros[1];
-						game.num3 = ca.Sorteios[0].Numeros[2]; 
-						game.num4 = ca.Sorteios[0].Numeros[3]; 
-						game.num5 = ca.Sorteios[0].Numeros[4]; 
-						game.num6 = ca.Sorteios[0].Numeros[5];
+						game.concurso = ca.numero;
+						game.num1 = ca.sorteio[0]; 
+						game.num2 = ca.sorteio[1];
+						game.num3 = ca.sorteio[2]; 
+						game.num4 = ca.sorteio[3]; 
+						game.num5 = ca.sorteio[4]; 
+						game.num6 = ca.sorteio[5];
 						GameService.register(game).success(function(response){
 							console.log('Atualizando '+JSON.stringify(game));
 						});
@@ -113,7 +113,7 @@
 		var concursoAtrasado = function(numero, defer) {
 			var retorno = {};
 			GameService.getWsCaixa(numero).success(function(data){//.load(function(data){
-				console.log('Retornando dados do concurso'+data.NumeroConcurso+ ' .');
+				console.log('Retornando dados do concurso'+data.numero+ ' .');
 				console.log(JSON.stringify(data));
 				retorno = data;
 			  }).error(function(error) {

@@ -81,7 +81,7 @@ angular.module('gamesService', ['ngResource']).
         	if(concurso != undefined){
         		//return $http.get('http://wsloterias.azurewebsites.net/api/sorteio/getresultado/1/'+concurso,{});
         		//$resource('http://wsloterias.azurewebsites.net/api/sorteio/getresultado/1/'+concurso, { format: 'json', jsoncallback: 'JSON_CALLBACK' }, { 'load': { 'method': 'JSONP' } });
-        		return $http.get('http://wsloterias.azurewebsites.net/api/sorteio/getresultado/1/'+concurso, { 
+        		return $http.get('https://www.lotodicas.com.br/api/mega-sena/'+concurso, { 
         			headers: {
 	                'Content-Type': 'application/json' , 
 	                'Access-Control-Allow-Origin': '*',
@@ -90,7 +90,7 @@ angular.module('gamesService', ['ngResource']).
         			}
         		});
         	}else{
-        		return $http.get('http://wsloterias.azurewebsites.net/api/sorteio/getresultado/1/',{
+        		return $http.get('https://www.lotodicas.com.br/api/mega-sena/',{
         			headers: {
 	                'Content-Type': 'application/json' , 
 	                'Access-Control-Allow-Origin': '*',
@@ -102,6 +102,10 @@ angular.module('gamesService', ['ngResource']).
         	}
             
         };
+        /*
+          {"numero":1667,"data":"2015-01-07","sorteio":[51,24,56,7,12,44],"ganhadores":[1,143,7934],"rateio":[5862774.49,13544.91,348.75],
+          "acumulado":"nao","valor_acumulado":0,"cidades":[["VILA VELHA","ES"]],"proximo_estimativa":3000000,"proximo_data":"2015-01-10"}
+         */
        /*
         {"NumeroConcurso":1771,"Acumulou":true,"EstimativaPremio":195000000.00,"ValorAcumulado":187769207.55,"Data":"2015-12-19","RealizadoEm":"Sorteio realizado em TARUMIRIM/MG  ",
         "DescricaoAcumuladoOutro":"Valor acumulado para o próximo concurso de final cinco (1775)","ValorAcumuladoOutro":14497772.35,"DataProximo":"2015-12-22","ValorAcumuladoEspecial":95412469.00,
