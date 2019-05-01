@@ -77,6 +77,14 @@ angular.module('gamesService', ['ngResource']).
             return $http.post('rest/surpresa',game);
         };
         
+        factory.getGame = function (concurso) {
+            return $http.get('rest/surpresa/game',{
+            	params : {
+					numero : concurso
+				}
+            });
+        };
+        
         factory.getWsCaixa = function (concurso) {
         	if(concurso != undefined){
         		//return $http.get('http://wsloterias.azurewebsites.net/api/sorteio/getresultado/1/'+concurso,{});

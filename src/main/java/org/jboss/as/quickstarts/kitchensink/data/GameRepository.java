@@ -45,7 +45,7 @@ public class GameRepository {
         // Swap criteria statements if you would like to try out type-safe criteria queries, a new
         // feature in JPA 2.0
         // criteria.select(member).orderBy(cb.asc(member.get(Member_.name)));
-        criteria.select(g);
+        criteria.select(g).orderBy(cb.asc(g.get(Game_.concurso)));;
         return em.createQuery(criteria).getResultList();
     }
     

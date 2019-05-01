@@ -60,12 +60,13 @@ public class SurpresaService {
     public List<Ocorrencia> listaOcorrencia(Integer begin, Integer end) throws Exception {
         //log.info("Calculating " + game);
        List<Game> games = allGames;
-       List<Ocorrencia> ocorrencias = se.getHistoricoOcorrencias(games);
-       Integer calcEnd = ocorrencias.size();
+       List<Ocorrencia> ocorrencias = se.getHistoricoOcorrencias(games, begin);
+       return ocorrencias;
+       /*Integer calcEnd = ocorrencias.size();
        if(end > begin){
     	   calcEnd = end;
        }
-       return ocorrencias. subList(begin - 2, calcEnd);
+       return ocorrencias. subList(begin - 1, calcEnd);*/
     }
     
     public List<Ocorrencia> listaNumerosOcorrencia() throws Exception {
@@ -77,7 +78,7 @@ public class SurpresaService {
     	   Ocorrencia o = new Ocorrencia();
     	   o.setNumero(num);
     	   o.setQuantidade(result.get(num));
-    	   o.setClasseAparicao(se.getClasseOcorrencia(result, o.getQuantidade()));
+    	   o.setClasseAparicao(se.getClasseOcorrenciapPorPosicao(result, num));
     	   ocorrencias.add(o);
        }       
        

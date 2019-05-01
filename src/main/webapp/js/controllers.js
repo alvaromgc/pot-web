@@ -19,9 +19,9 @@
 
 	angular.module('membersCtrl', [ 'ngResource' ]).controller('MembersCtrl', MembersCtrl);
 
-	MembersCtrl.$inject = [ '$scope', '$location', '$http', 'Members', 'GameService', '$q'];
+	MembersCtrl.$inject = [ '$scope', '$location', '$http', 'Members', 'GameService', '$q', '$route'];
 
-	function MembersCtrl($scope, $location, $http, Members, GameService, $q) {
+	function MembersCtrl($scope, $location, $http, Members, GameService, $q, $route) {
 
 		var vm = this;
 		
@@ -50,8 +50,8 @@
 		$scope.check =  function() {
 			var ultimo = $scope.allGames.length;//$scope.allGames[$scope.allGames.length - 1].concurso;
 			var retorno = {};
-			GameService.getWsCaixa().success(function(data){//.load(function(data){
-				 retorno = data;
+			GameService.getGame().success(function(response){//.getWsCaixa()
+				 retorno = response;
 				 //console.log(JSON.stringify(data));
 			  }).error(function(error) {
 				 console.log("Erro: "+JSON.stringify(error));
@@ -66,7 +66,8 @@
 						console.log('Tudo atualizado');
 						//$scope.loadGames();
 						//alert('Atualizado com sucesso.');
-						$location.path('/home');
+						//$location.path('/home');
+						$route.reload();
 					});
 				}else{
 					console.log('Tudo atualizado');
@@ -112,10 +113,10 @@
 		
 		var concursoAtrasado = function(numero, defer) {
 			var retorno = {};
-			GameService.getWsCaixa(numero).success(function(data){//.load(function(data){
-				console.log('Retornando dados do concurso'+data.numero+ ' .');
-				console.log(JSON.stringify(data));
-				retorno = data;
+			GameService.getGame(numero).success(function(response){//.load(function(data){  --  getWsCaixa
+				console.log('Retornando dados do concurso'+response.numero+ ' .');
+				console.log(JSON.stringify(response));
+				retorno = response;
 			  }).error(function(error) {
 				defer.reject(error);
 			  }).then(function() {
@@ -214,8 +215,8 @@
 	    	GameService.getMediaDesv($scope.inicio,0).success(function(response) {
 	    		$scope.medDesv = response;
 	    		$scope.concursos = [];
-		        for(var i = $scope.inicio; i <= $scope.allGames.length; i++){
-		        	$scope.concursos.push(i.toString());
+		        for(var i = $scope.inicio; i < $scope.allGames.length; i++){
+		        	$scope.concursos.push($scope.allGames[i].concurso);
 		        }
 			}).then(function(){
 //				$scope.labels = $scope.concursos;
@@ -246,6 +247,7 @@
 	        console.log(points, evt);
 	    };
 	    
+	    //FIXME CORRIGIR ESSE METODO
 	    $scope.geraGraficoOcorrencias = function(inicio, fim){
 	    	limparGraficoMedia();
 	    	$scope.concursos = [];
@@ -256,8 +258,8 @@
 		        $scope.ocMedioMaior = [];
 		        $scope.ocMedioMenor = [];
 		        $scope.ocMenor= [];
-	    		for(var i = inicio; i <= $scope.allGames.length; i++){
-		        	$scope.concursos.push(i.toString());
+	    		for(var i = inicio; i < $scope.allGames.length; i++){
+		        	$scope.concursos.push($scope.allGames[i].concurso);
 		        }
 	    		var i = 0;
 		        resultadosOcorrencia.forEach(function(res) {

@@ -34,15 +34,26 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
 
+import org.jboss.as.quickstarts.kitchensink.model.EntityWsCaixa;
 import org.jboss.as.quickstarts.kitchensink.model.Game;
 import org.jboss.as.quickstarts.kitchensink.model.Guess;
 import org.jboss.as.quickstarts.kitchensink.model.MediaDesv;
 import org.jboss.as.quickstarts.kitchensink.model.Ocorrencia;
 import org.jboss.as.quickstarts.kitchensink.service.GameRegistration;
 import org.jboss.as.quickstarts.kitchensink.service.SurpresaService;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.json.JSONString;
+
+import com.google.gson.Gson;
 
 /**
  * JAX-RS Example
@@ -65,6 +76,37 @@ public class SurpresaResourceRESTService {
     @Inject
     private List<Game> allGames;
 
+    
+    @GET
+    @Path("/game")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getExternalGame(@QueryParam("numero") Integer numero) {
+    	EntityWsCaixa wsCx = new EntityWsCaixa();
+    	Client client = ClientBuilder.newClient();
+
+    	String param = numero != null ? numero.toString() : "";
+    	WebTarget target = client.target("https://www.lotodicas.com.br/api/mega-sena/"+param);
+    	String result = target.request().get(String.class);
+    	Gson g = new Gson();
+    	
+    	wsCx = g.fromJson(result, EntityWsCaixa.class);
+    	//JSONObject response = target.request(MediaType.APPLICATION_JSON).get(JSONObject.class);
+    	/*
+    	try {
+	    	wsCx.setNumero((Integer)response.get("numero"));
+	    	JSONArray numeros;
+			numeros = response.getJSONArray("sorteio");
+			for (int i = 0; i < numeros.length(); i++) {
+				wsCx.getSorteio().add(numeros.getInt(i));
+			}
+		
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			return Response.serverError().build();
+		}*/
+    	return Response.ok(wsCx).build();
+    }
+    
     @GET
     @Path("/resultados")
     @Produces(MediaType.APPLICATION_JSON)

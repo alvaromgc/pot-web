@@ -8,6 +8,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.inject.Inject;
@@ -74,10 +75,17 @@ public class SurpresaEngine {
 					boolean depVale = false;
 					Double calcmed = media(seq);
 					Double calcdep = desv(seq, calcmed);
+					
+					Double rangemdw = med-2.0d;
+					Double rangemup = rangemdw + 4.0d;
+					Double rangeddw = dep-2.0d;
+					Double rangedup = rangeddw + 4.0d;
+					
+					/* antiga margem
 					Double rangemdw = med-0.5d;
 					Double rangemup = rangemdw + 0.5d;
 					Double rangeddw = dep-0.5d;
-					Double rangedup = rangeddw + 0.5d;
+					Double rangedup = rangeddw + 0.5d;*/
 					
 					if(rangemdw.compareTo(calcmed) < 0 && calcmed.compareTo(rangemup) < 0){
 						medVale = true;
@@ -282,16 +290,25 @@ public class SurpresaEngine {
 	 * Busca o historico das ordens de aparicao a partir do kesimo concurso
 	 * @param resultados
 	 */
-	public List<Ocorrencia> getHistoricoOcorrencias(List<Game> resultados){
+	//TODO ALGO ERRADO AQUI
+	public List<Ocorrencia> getHistoricoOcorrencias(List<Game> resultados, int inicio){
 		List<Ocorrencia> listaTiposOcorrencia = new ArrayList<Ocorrencia>();
-		for(int i = 1; i < resultados.size(); i++){
-			List<Game> parcial = resultados.subList(0, i -1);
+		for(int i = inicio; i < resultados.size(); i++){
+			List<Game> parcial = new ArrayList<>();
+			if(i == 0){
+			//
+			}else if(i == 1){
+				parcial.add(resultados.get(0));
+			}else{
+				parcial = resultados.subList(0, i);
+			}
 			Map<Integer, Integer> mapaParcial = analiseOrdemAparicoes(parcial);
 			int[] a = {0,0,0,0};
 			//mapa de ocorrencias gerado a partir do 100 resultado
-			if(i > 100){
-				a = quantidadeMaioMenorOcorrencia(mapaParcial, resultados.get(i).getList());
-			}
+			//if(i > 100){
+			a = quantidadeMaioMenorOcorrencia(mapaParcial, resultados.get(i).getList());
+			//}
+			
 			Ocorrencia oc = new Ocorrencia();
 			oc.setOcorrencias(a);
 			listaTiposOcorrencia.add(oc);
@@ -338,30 +355,20 @@ public class SurpresaEngine {
 	public int[] quantidadeMaioMenorOcorrencia(Map<Integer, Integer> mapa,
 			List<Integer> jog) {
 		
-		Iterator<Integer> ite = mapa.keySet().iterator(); 
-		Integer menorValor = mapa.get((Integer)ite.next());
-		Integer maiorValor = 0;
-		while (ite.hasNext()) {
-			maiorValor = mapa.get((Integer) ite.next());
-		}
-		
-		Integer meio = (Integer)((maiorValor + menorValor)/2);
-		Integer umQuarto = (Integer)((meio + menorValor)/2);
-		Integer tresQuarto = (Integer)((maiorValor + meio)/2);
-		
 		int[] relOcorr = {0,0,0,0};
 		for (Integer num : jog) {
-			Integer saiu = mapa.get(num);
-			if(saiu >= tresQuarto){
+			EnumClasseAparicao eca = getClasseOcorrenciapPorPosicao(mapa, num);
+			if(eca.equals(EnumClasseAparicao.MAIOR)){
 				relOcorr[0]++;
-			}else if(saiu < tresQuarto && saiu >= meio){
+			}else if(eca.equals(EnumClasseAparicao.MEDIO_MAIOR)){
 				relOcorr[1]++;
-			}else if(saiu >= umQuarto && saiu < meio){
+			}else if(eca.equals(EnumClasseAparicao.MEDIO_MENOR)){
 				relOcorr[2]++;
-			}else if(saiu < umQuarto){
+			}else if(eca.equals(EnumClasseAparicao.MENOR)){
 				relOcorr[3]++;
 			}
 		}
+		
 		return relOcorr;
 	}
 	
@@ -381,7 +388,7 @@ public class SurpresaEngine {
 		}
 	}
 	
-	public EnumClasseAparicao getClasseOcorrencia(Map<Integer, Integer> mapa, Integer quantidade){
+	public EnumClasseAparicao getClasseOcorrenciapPorQuantidade(Map<Integer, Integer> mapa, Integer quantidade){
 		Iterator<Integer> ite = mapa.keySet().iterator(); 
 		Integer menorValor = mapa.get((Integer)ite.next());
 		Integer maiorValor = 0;
@@ -403,6 +410,24 @@ public class SurpresaEngine {
 			eca = EnumClasseAparicao.MEDIO_MENOR;
 		}else if(quantidade < umQuarto){
 			eca = EnumClasseAparicao.MENOR;
+		}
+		
+		return eca;
+	}
+	
+	public EnumClasseAparicao getClasseOcorrenciapPorPosicao(Map<Integer, Integer> mapa, Integer numero){
+		List<Integer> numerosOrdenados = new ArrayList<>();  
+		numerosOrdenados.addAll(mapa.keySet());
+		int posicao = numerosOrdenados.indexOf(numero); 
+		EnumClasseAparicao eca = null;
+		if(posicao < 15){
+			eca = EnumClasseAparicao.MENOR;
+		}else if(posicao < 30){
+			eca = EnumClasseAparicao.MEDIO_MENOR;
+		}else if(posicao < 45){
+			eca = EnumClasseAparicao.MEDIO_MAIOR;
+		}else if(posicao <= 60){
+			eca = EnumClasseAparicao.MAIOR;
 		}
 		
 		return eca;
