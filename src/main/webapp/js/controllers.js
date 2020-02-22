@@ -50,7 +50,7 @@
 		$scope.check =  function() {
 			var ultimo = $scope.allGames.length;//$scope.allGames[$scope.allGames.length - 1].concurso;
 			var retorno = {};
-			GameService.getGame().success(function(response){//.getWsCaixa()
+			GameService.getGame().success(function(response){//.getWsCaixa()  .getGame()
 				 retorno = response;
 				 //console.log(JSON.stringify(data));
 			  }).error(function(error) {
@@ -215,7 +215,7 @@
 	    	GameService.getMediaDesv($scope.inicio,0).success(function(response) {
 	    		$scope.medDesv = response;
 	    		$scope.concursos = [];
-		        for(var i = $scope.inicio; i < $scope.allGames.length; i++){
+		        for(var i = $scope.inicio-1; i < $scope.allGames.length; i++){
 		        	$scope.concursos.push($scope.allGames[i].concurso);
 		        }
 			}).then(function(){
@@ -279,7 +279,7 @@
 				
 				$scope.chartConfigMedMax.series = [];
 		        $scope.chartConfigMedMax.series.push({
-		            name: "Maior Ocr",
+		            name: "Maior Ocorrencia",
 		        	data: $scope.ocMaior
 		        });
 		        $scope.chartConfigMedMax.series.push({
@@ -297,7 +297,7 @@
 		        	data: $scope.ocMedioMenor
 		        });
 		        $scope.chartConfigMedMin.series.push({
-		            name: "Menor ocr",
+		            name: "Menor ocorrencia",
 		        	data: $scope.ocMenor
 		        });
 		        $scope.chartConfigMedMin.xAxis = {};
@@ -353,7 +353,7 @@
 	                data: []
 	            }],*/
 	            title: {
-	                text: 'MedMax'
+	                text: 'Media Maior'
 	            }
 	            //,
 	            //xAxis: {currentMin: 0, currentMax: 10, minRange: 1},
@@ -371,7 +371,7 @@
 	                data: []
 	            }],*/
 	            title: {
-	                text: 'MedMin'
+	                text: 'Media Menor'
 	            }
 	            //,
 	            //xAxis: {currentMin: 0, currentMax: 10, minRange: 1},
@@ -393,18 +393,18 @@
 				$scope.errorMessages.push("Campo media incorreto.");
 				return false;
 			}
-			if(isNaN(guess.desvio)){
-				$scope.errorMessages.push("Campo desvio incorreto.");
-				return false;
-			}
+			//if(isNaN(guess.desvio)){
+			//	$scope.errorMessages.push("Campo desvio incorreto.");
+			//	return false;
+			//}
 			if(isNaN(guess.maiorFrequencia) || isNaN(guess.mediaMaiorFrequencia) || isNaN(guess.mediaMenorFrequencia) || isNaN(guess.menorFrequencia)){
 				$scope.errorMessages.push("Campos frequencia incorretos.");
 				return false;
 			}
-			if((guess.maiorFrequencia + guess.mediaMaiorFrequencia + guess.mediaMenorFrequencia + guess.menorFrequencia) != 6){
+			/*if((guess.maiorFrequencia + guess.mediaMaiorFrequencia + guess.mediaMenorFrequencia + guess.menorFrequencia) != 6){
 				$scope.errorMessages.push("Soma das frequencias deve ser 6.");
 				return false;
-			}
+			}*/
 			return valido;
 			
 		};

@@ -127,13 +127,13 @@
 	    <table ng-hide="numerosOcorrencia.length == 0 || hideStats" class="simpletablestyle">
 	        <thead>
 	            <tr>
-	                <th>Number</th>
-	                <th>Ocurrencies</th>
-	                <th>Classe Ocorrencia</th>
+	                <th>Numero<input type="text" name="name" id="filtroNumero"  ng-model="filtroNumero"/></th>
+	                <th>Ocorrências</th>
+	                <th>Classe Ocorrência</th>
 	            </tr>
 	        </thead>
 	        <!-- The table is built using the AngularJS repeat function, iterating over the members variable, and ordering by the property specified in the orderBy variable -->
-	        <tr ng-repeat="oc in numerosOcorrencia ">
+	        <tr ng-repeat="oc in numerosOcorrencia | filter:{numero: filtroNumero} ">
 	            <td>{{oc.numero}}</td>
 	            <td>{{oc.quantidade}}</td>
 	            <td>{{oc.classeAparicao}}</td>
@@ -209,7 +209,7 @@
             </div>
             <div>
                 <label for="desvio">Desvio:</label>
-                <input type="text" name="desvio" id="desvio" ng-model="guess.desvio" required/>
+                <input type="text" name="desvio" id="desvio" ng-model="guess.desvio" /><!-- required -->
                 <span class="error" ng-show="errors.email">{{errors.email}}</span>
             </div>
             <div>

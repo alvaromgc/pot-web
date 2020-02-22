@@ -39,7 +39,6 @@ import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.ResponseBuilder;
 
 import org.jboss.as.quickstarts.kitchensink.model.EntityWsCaixa;
 import org.jboss.as.quickstarts.kitchensink.model.Game;
@@ -48,12 +47,12 @@ import org.jboss.as.quickstarts.kitchensink.model.MediaDesv;
 import org.jboss.as.quickstarts.kitchensink.model.Ocorrencia;
 import org.jboss.as.quickstarts.kitchensink.service.GameRegistration;
 import org.jboss.as.quickstarts.kitchensink.service.SurpresaService;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.json.JSONString;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 /**
  * JAX-RS Example
@@ -81,15 +80,31 @@ public class SurpresaResourceRESTService {
     @Path("/game")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getExternalGame(@QueryParam("numero") Integer numero) {
-    	EntityWsCaixa wsCx = new EntityWsCaixa();
     	Client client = ClientBuilder.newClient();
 
-    	String param = numero != null ? numero.toString() : "";
-    	WebTarget target = client.target("https://www.lotodicas.com.br/api/mega-sena/"+param);
-    	String result = target.request().get(String.class);
+    	String param = numero != null ? numero.toString() : "last";
+    	String token = "37362116091d2facbbc33fecdaf75bcd6e19da4bc06754506009db6152fe39ea";
+    	WebTarget target = client.target("https://www.lotodicas.com.br/");
+    	String result = target.path("/api/v2/mega_sena/results/"+param)
+    			.queryParam("token", token)
+    			.request().get(String.class);
     	Gson g = new Gson();
-    	
-    	wsCx = g.fromJson(result, EntityWsCaixa.class);
+    	JsonParser parser = new JsonParser();
+    	JsonObject resultJson = parser.parse(result).getAsJsonObject();
+    	EntityWsCaixa wsCx = new EntityWsCaixa();
+    	/*
+    	 * {"code":200,"status":"success","data":{"draw_number":2235,"draw_date":"2020-02-19 20:00:00-03",
+    	 * "drawing":{"draw":[14,18,30,35,55,57]},"prizes":[{"name":"Sena","winners":0,"prize":0},
+    	 * {"name":"Quina","winners":133,"prize":69161.57},{"name":"Quadra","winners":11895,"prize":1104.72}],
+    	 * "cities":[],"has_winner":false,"next_draw_date":"2020-02-22 20:00:00-03","next_draw_prize":190000000}}
+    	 */
+    	wsCx.setNumero(resultJson.get("data").getAsJsonObject().get("draw_number").getAsInt());
+    	wsCx.setSorteio(new ArrayList<Integer>());
+    	JsonArray numeros = resultJson.get("data").getAsJsonObject().get("drawing").getAsJsonObject().get("draw").getAsJsonArray(); 
+    	for (JsonElement jsonElement : numeros) {
+			wsCx.getSorteio().add(jsonElement.getAsInt());
+		}
+    	//wsCx2 = g.fromJson(result, EntityWsCaixaV2.class);
     	//JSONObject response = target.request(MediaType.APPLICATION_JSON).get(JSONObject.class);
     	/*
     	try {

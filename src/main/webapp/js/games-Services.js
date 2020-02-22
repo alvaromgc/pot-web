@@ -33,7 +33,13 @@ angular.module('gamesService', ['ngResource']).
     'use strict';
     
     angular.module('gamesService', ['ngResource'])
-    
+    .config(['$sceDelegateProvider', function($sceDelegateProvider) {
+	  // We must whitelist the JSONP endpoint that we are using to show that we trust it
+	  $sceDelegateProvider.resourceUrlWhitelist([
+	    'self',
+	    'https://www.lotodicas.com.br/**'
+	  ]);
+	}])
     .factory('GameService', GameService);
     
     GameService.$inject = ['$http', '$resource'];
@@ -86,22 +92,23 @@ angular.module('gamesService', ['ngResource']).
         };
         
         factory.getWsCaixa = function (concurso) {
+        	var token = '37362116091d2facbbc33fecdaf75bcd6e19da4bc06754506009db6152fe39ea';
         	if(concurso != undefined){
         		//return $http.get('http://wsloterias.azurewebsites.net/api/sorteio/getresultado/1/'+concurso,{});
         		//$resource('http://wsloterias.azurewebsites.net/api/sorteio/getresultado/1/'+concurso, { format: 'json', jsoncallback: 'JSON_CALLBACK' }, { 'load': { 'method': 'JSONP' } });
-        		return $http.get('https://www.lotodicas.com.br/api/mega-sena/'+concurso, { 
+        		return $http.get('https://www.lotodicas.com.br/api/v2/mega_sena/results/'+concurso+'?token='+token, { 
         			headers: {
 	                'Content-Type': 'application/json' , 
-	                'Access-Control-Allow-Origin': '*',
+	                'Access-Control-Allow-Origin': 'https://www.lotodicas.com.br/api/v2',
 	                'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
 	                'Access-Control-Allow-Headers':'X-Requested-With'	
         			}
         		});
         	}else{
-        		return $http.get('https://www.lotodicas.com.br/api/mega-sena/',{
+        		return $http.get('https://www.lotodicas.com.br/api/v2/mega_sena/results/last?token='+token,{
         			headers: {
 	                'Content-Type': 'application/json' , 
-	                'Access-Control-Allow-Origin': '*',
+	                'Access-Control-Allow-Origin': 'https://www.lotodicas.com.br/api/v2',
 	                'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
 	                'Access-Control-Allow-Headers':'X-Requested-With'	
         			}

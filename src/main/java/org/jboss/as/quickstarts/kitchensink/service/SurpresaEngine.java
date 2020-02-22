@@ -25,7 +25,9 @@ public class SurpresaEngine {
 	@Inject
     private Logger log;
 
-	public Random random = new Random();
+	private long fiboseed = 1123581321345589144l;
+	
+	public Random random = new Random(fiboseed);
 	
 	public void setSeed(long seed){
 		this.random = new Random(seed);
@@ -90,7 +92,8 @@ public class SurpresaEngine {
 					if(rangemdw.compareTo(calcmed) < 0 && calcmed.compareTo(rangemup) < 0){
 						medVale = true;
 					}
-					if(rangeddw.compareTo(calcdep) < 0 && calcdep.compareTo(rangedup) < 0){
+					if(Double.valueOf(dep).equals(Double.valueOf(0.0d)) 
+							|| (rangeddw.compareTo(calcdep) < 0 && calcdep.compareTo(rangedup) < 0 )){
 						depVale = true;
 					}
 					
